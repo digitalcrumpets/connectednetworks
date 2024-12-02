@@ -294,12 +294,11 @@ const retrievePreviousQuote = () => {
       quoteQuestionsModal.style.display = "flex";
     }
 
-    showStep(currentStep);
+showStep(currentStep);
 
-    alert("Your previous quote has been loaded successfully.");
-  } catch (error) {
-    alert("An error occurred while retrieving your saved quote. Please start a new quote.");
-  }
+} catch (error) {
+    console.error("An error occurred while retrieving your saved quote. Please start a new quote.");
+}
 };
 
 // Map saved API data to UI elements
