@@ -204,8 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error parsing saved API:", error);
     }
 
-    // Hide button if contractTermMonths exists, otherwise toggle based on savedApi presence
-    if (apiData?.btQuoteParams?.contractTermMonths) {
+    // Hide button if contractTermMonths has a valid value greater than 0
+    if (apiData?.btQuoteParams?.contractTermMonths > 0) {
       retrieveButton.style.display = "none"; // Hide button
     } else if (savedApi && savedApi !== "{}") {
       retrieveButton.style.display = "block"; // Show button
