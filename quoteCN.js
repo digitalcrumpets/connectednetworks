@@ -158,11 +158,12 @@ const openModal = () => {
 };
 
 // Initialize Address Lookup
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById('lookupAddressButton');
+  const postcodeInput = document.getElementById('userPostcode');
 
-  button.addEventListener('click', async () => {
-    const postcodeInput = document.getElementById('userPostcode');
+  // Function to handle postcode lookup
+  const handlePostcodeLookup = async () => {
     const postcode = normalizePostcode(postcodeInput.value.trim());
 
     if (!postcode) {
@@ -185,6 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
       displayResults(results);
     } else {
       displayError("We couldn't find your address. Please confirm your postcode and try again.");
+    }
+  };
+
+  // Add click event to the button
+  button.addEventListener('click', handlePostcodeLookup);
+
+  // Add keydown event to the input field
+  postcodeInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission or page refresh
+      handlePostcodeLookup(); // Call the postcode lookup function
     }
   });
 });
