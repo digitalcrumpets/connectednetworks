@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add click event to the button
   button.addEventListener('click', handlePostcodeLookup);
 
-  // Add keydown event to the input field
+  // Add keydown event to the input field for the Enter key
   postcodeInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent default form submission or page refresh
