@@ -192,20 +192,31 @@ document.addEventListener('DOMContentLoaded', () => {
 // Check if backup quote exists
 document.addEventListener("DOMContentLoaded", () => {
   const retrieveButton = document.getElementById("retrievePrevQuote");
-  
+
   if (retrieveButton) {
     // Check if a previous quote exists in localStorage
     const savedApi = localStorage.getItem("api");
+    let apiData = null;
 
-    // Toggle button visibility based on presence of savedApi
-    if (savedApi && savedApi !== "{}") {
+    try {
+      apiData = savedApi ? JSON.parse(savedApi) : null;
+    } catch (error) {
+      console.error("Error parsing saved API:", error);
+    }
+
+    // Hide button if contractTermMonths exists, otherwise toggle based on savedApi presence
+    if (apiData?.btQuoteParams?.contractTermMonths) {
+      retrieveButton.style.display = "none"; // Hide button
+    } else if (savedApi && savedApi !== "{}") {
       retrieveButton.style.display = "block"; // Show button
     } else {
       retrieveButton.style.display = "none"; // Hide button
     }
 
     // Attach click event listener if the button is visible
-    retrieveButton.addEventListener("click", retrievePreviousQuote);
+    if (retrieveButton.style.display === "block") {
+      retrieveButton.addEventListener("click", retrievePreviousQuote);
+    }
   }
 });
 
