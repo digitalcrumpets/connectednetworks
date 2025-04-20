@@ -408,6 +408,31 @@
                             <div id="quotePOSTLoader" class="loader" style="display: none;"></div>
                             <div id="apiResponseText" class="response-message" style="display: none;"></div>
                         </section>
+
+                        <!-- Pricing Cards Section -->
+                        <section id="pricingCardsSection" class="quotequestionssection">
+                            <h2>Select Your Pricing Option</h2>
+                            <p>Choose the pricing package that best suits your needs.</p>
+                            
+                            <div class="pricing-categories">
+                                <div class="pricing-category-tabs">
+                                    <div class="pricing-tab active" data-category="etherway">Etherway</div>
+                                    <div class="pricing-tab" data-category="etherflow">Etherflow</div>
+                                    <div class="pricing-tab" data-category="etherflowCircuit2">Etherflow Circuit 2</div>
+                                </div>
+                            </div>
+
+                            <div class="pricing-cards-container">
+                                <!-- Pricing cards will be populated dynamically -->
+                            </div>
+                            
+                            <div class="error-message" id="step-pricingCards-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="pricingCardsPrev" class="button secondary">Previous</button>
+                                <button id="pricingCardsNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
                     </div>
 
                     <!-- Summary Panel -->

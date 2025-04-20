@@ -284,6 +284,20 @@ export const stepConfig = {
             prev: () => (getApiValue('securityQuoteParams.secureIpDelivery') === false ? 'quoteSecureIpDelivery' : 'quoteRBIRequired')
         },
         validationRules: {}
+    },
+    // --- Step 17: Pricing Cards ---
+    pricingCardsSection: {
+        label: 'Pricing Options',
+        type: 'selection',
+        selector: '.pricing-card',
+        apiKey: 'btQuoteParams.selectedPricing',
+        valueAttr: 'data-plan-name',
+        isRequired: true,
+        navigation: {
+            next: null, // This is the final step
+            prev: 'quoteContractTerms'
+        },
+        validationRules: {}
     }
 };
 

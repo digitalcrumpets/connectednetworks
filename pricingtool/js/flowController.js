@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', initializeQuoteForm);
 // Import UI helper functions
 import { displayError, hideError, showLoader, hideLoader, openModal, closeModal, enableButton, disableButton } from './uiHelpers.js';
 import { getApiValue } from './apiState.js';
+import { initializePricingCards, getSelectedPricingOption } from './pricingCards.js';
 
 // Global API state object
 let api = {
@@ -1651,119 +1652,79 @@ function selectCardItem(stepId, value) {
 let isSubmitting = false; // Flag to prevent multiple simultaneous submissions
 
 async function submitQuote() {
-    // Prevent multiple submissions
-    if (isSubmitting) {
-        console.log('Submission already in progress, ignoring duplicate request');
-        return;
-    }
+    if (isSubmitting) return; // Prevent multiple submissions
     
-    // Set submitting flag
     isSubmitting = true;
     
-    // Show loader
+    // Get references to UI elements
     const loader = document.getElementById('quotePOSTLoader');
+    const errorDisplay = document.getElementById('submissionError');
+    const responseText = document.getElementById('apiResponseText');
+    
+    // Show loader
     if (loader) loader.style.display = 'block';
     
-    // Hide any previous response/error
-    const responseText = document.getElementById('apiResponseText');
+    // Clear previous error/response messages
+    if (errorDisplay) errorDisplay.style.display = 'none';
     if (responseText) responseText.style.display = 'none';
     
-    // Hide any error
-    const errorDisplay = document.getElementById('submissionError');
-    if (errorDisplay) errorDisplay.style.display = 'none';
-    
     try {
-        // Debug - log the full API state before submission
-        console.log('API state before submission:', JSON.parse(JSON.stringify(api)));
-        
-        // Check if location data is missing and attempt to recover from localStorage
-        if (!api.locationIdentifier?.id || !api.locationIdentifier?.postcode) {
-            console.log('Location identifier missing from api object, attempting to recover from localStorage...');
-            
-            // Try to load from localStorage
-            try {
-                const stored = localStorage.getItem('quoteFormData');
-                if (stored) {
-                    const storedData = JSON.parse(stored);
-                    if (storedData?.locationIdentifier?.id && storedData?.locationIdentifier?.postcode) {
-                        console.log('Found location data in localStorage, restoring...');
-                        api.locationIdentifier = storedData.locationIdentifier;
-                    }
-                }
-            } catch (e) {
-                console.error('Error recovering location data from localStorage:', e);
-            }
+        // Validate all required fields are set
+        if (!api.btQuoteParams.contractTermMonths) {
+            throw new Error('Please select a contract term before submitting.');
         }
         
-        // Ensure locationIdentifier is always present with id
-        if (!api.locationIdentifier?.id) {
-            console.error('Missing location data even after recovery attempts. API state:', api);
-            throw new Error("Location identifier (ID) is required to submit a quote.");
-        }
-
-        // Create the payload to match the exact API format provided in the example
-        let requestBody = {
-            // Location identifier with id and postcode
-            locationIdentifier: {
-                id: api.locationIdentifier.id,
-                postcode: api.locationIdentifier.postcode || ""
-            },
-            
-            // BT Quote Params with required fields
+        // Based on error messages, the API expects these fields at the top level
+        const requestBody = {
+            // Required top-level objects
+            locationIdentifier: {...api.locationIdentifier},
             btQuoteParams: {
+                // Copy existing params
+                ...api.btQuoteParams,
+                
+                // Ensure required values have defaults
                 serviceType: api.btQuoteParams.serviceType || "single",
-                circuitInterface: api.btQuoteParams.circuitInterface || "",
+                circuitInterface: api.btQuoteParams.circuitInterface || "1 Gbit/s",
                 circuitBandwidth: formatBandwidth(api.btQuoteParams.circuitBandwidth) || "100 Mbit/s",
                 numberOfIpAddresses: api.btQuoteParams.numberOfIpAddresses || "Block /29 (8 LAN IP Addresses)",
                 preferredIpBackbone: api.btQuoteParams.preferredIpBackbone || "BT"
             },
-            
-            // Security params with all possible options
             securityQuoteParams: {
-                secureIpDelivery: api.securityQuoteParams?.secureIpDelivery ?? false,
-                ztnaRequired: api.securityQuoteParams?.ztnaRequired ?? false,
+                // Set all required boolean fields to false by default if null
+                secureIpDelivery: api.securityQuoteParams?.secureIpDelivery === true,
+                ztnaRequired: api.securityQuoteParams?.ztnaRequired === true,
                 noOfZtnaUsers: api.securityQuoteParams?.noOfZtnaUsers || 0,
-                threatPreventionRequired: api.securityQuoteParams?.threatPreventionRequired ?? false,
-                casbRequired: api.securityQuoteParams?.casbRequired ?? false,
-                dlpRequired: api.securityQuoteParams?.dlpRequired ?? false,
-                rbiRequired: api.securityQuoteParams?.rbiRequired ?? false
+                threatPreventionRequired: api.securityQuoteParams?.threatPreventionRequired === true,
+                casbRequired: api.securityQuoteParams?.casbRequired === true,
+                dlpRequired: api.securityQuoteParams?.dlpRequired === true,
+                rbiRequired: api.securityQuoteParams?.rbiRequired === true
             },
             
-            // Contract terms at top level 
-            contractTermMonths: api.btQuoteParams.contractTermMonths || 36
+            // Contract term as a number at top level
+            contractTermMonths: parseInt(api.btQuoteParams.contractTermMonths, 10) || 36
         };
         
-        // Add dual service specific fields only if service type is dual
-        if (api.btQuoteParams.serviceType === "dual" || 
-            api.btQuoteParams.serviceType === "Dual" || 
-            api.btQuoteParams.serviceType === "DUAL") {
-            
-            // For dual service, circuitTwoBandwidth must be a valid value from the enum list
-            // If the user hasn't selected one, use a default value from the list rather than empty string
-            const circuitTwoBandwidth = formatBandwidth(api.btQuoteParams.circuitTwoBandwidth);
-            
-            // If bandwidth is empty or invalid, set it to a default value
-            if (!circuitTwoBandwidth || circuitTwoBandwidth === "") {
-                // Default to 100 Mbit/s or the same as primary circuit bandwidth
+        // Handle dual service specific fields
+        if (requestBody.btQuoteParams.serviceType === "dual") {
+            if (!requestBody.btQuoteParams.circuitTwoBandwidth) {
                 requestBody.btQuoteParams.circuitTwoBandwidth = requestBody.btQuoteParams.circuitBandwidth || "100 Mbit/s";
             } else {
-                requestBody.btQuoteParams.circuitTwoBandwidth = circuitTwoBandwidth;
+                requestBody.btQuoteParams.circuitTwoBandwidth = formatBandwidth(requestBody.btQuoteParams.circuitTwoBandwidth);
             }
             
-            // Add dualInternetConfig for dual service
-            requestBody.btQuoteParams.dualInternetConfig = api.btQuoteParams.dualInternetConfig || "Active / Active";
-            
-            // Note: preferredDiverseIpBackbone doesn't appear in the example, so excluding it
+            // Ensure dualInternetConfig is set
+            if (!requestBody.btQuoteParams.dualInternetConfig) {
+                requestBody.btQuoteParams.dualInternetConfig = "Active / Active";
+            }
         }
         
-        // Ensure serviceType is lowercase as required by the API
-        if (requestBody.btQuoteParams.serviceType === 'Dual' || requestBody.btQuoteParams.serviceType === 'DUAL') {
-            requestBody.btQuoteParams.serviceType = 'dual';
-        } else if (requestBody.btQuoteParams.serviceType === 'Single' || requestBody.btQuoteParams.serviceType === 'SINGLE') {
-            requestBody.btQuoteParams.serviceType = 'single';
+        // Ensure essential fields are present
+        if (!requestBody.locationIdentifier || !requestBody.locationIdentifier.id) {
+            throw new Error('Location information is required. Please restart the quote process.');
         }
         
-        console.log('Submitting quote with payload matching example structure:', requestBody);
+        // Log the full request for debugging
+        console.log('Submitting Quote:', JSON.stringify(requestBody, null, 2));
         
         // Call the quote API with the correct endpoint
         const response = await fetch('https://conencted-networks-quoting-api.vercel.app/api/quote', {
@@ -1778,22 +1739,27 @@ async function submitQuote() {
         if (loader) loader.style.display = 'none';
         
         if (!response.ok) {
-            throw new Error(`API error: ${response.status} ${response.statusText}`);
+            const errorData = await response.json();
+            console.error('API Error:', errorData);
+            throw new Error(`API error: ${response.status} ${errorData.message || (errorData.error?.issues ? JSON.stringify(errorData.error.issues) : response.statusText)}`);
         }
         
         // Process successful response
         const result = await response.json();
         console.log('Quote submitted successfully:', result);
         
-        // Display success message
+        // Initialize pricing cards with the API response
+        initializePricingCards(result);
+        
+        // Navigate to the pricing cards section
+        showStep('pricingCardsSection');
+        
+        // Hide the response message (we're showing cards instead)
         if (responseText) {
-            responseText.textContent = 'Your quote has been submitted successfully. We will contact you shortly.';
-            responseText.className = 'response-message success-message';
-            responseText.style.display = 'block';
+            responseText.style.display = 'none';
         }
         
-        // Clear stored data
-        localStorage.removeItem('quoteFormData');
+        // Don't clear local storage yet - we'll do that after pricing selection
         
     } catch (error) {
         console.error('Error submitting quote:', error);
