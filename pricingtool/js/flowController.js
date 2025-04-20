@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', initializeQuoteForm);
 import { displayError, hideError, showLoader, hideLoader, openModal, closeModal, enableButton, disableButton } from './uiHelpers.js';
 import { getApiValue } from './apiState.js';
 import { initializePricingCards, getSelectedPricingOption } from './pricingCards.js';
+import { getConfig } from './stepConfig.js';
 
 // Global API state object
 let api = {
@@ -669,7 +670,7 @@ function openQuotesModal() {
         console.log(`openQuotesModal: Showing first step: ${firstStepId}`);
         showStep(firstStepId);
     } else {
-        console.error('Could not find quote modal or initial view element.');
+        console.error('Could not find modal or initial view element.');
     }
 }
 
@@ -685,37 +686,53 @@ function saveApiState() {
 
 // Set up form navigation between steps
 function setupStepNavigation() {
-    // Get all step sections
-    const steps = document.querySelectorAll('.quotequestionssection');
+    const nextButtons = document.querySelectorAll('[id$="Next"]');
+    const prevButtons = document.querySelectorAll('[id$="Prev"]');
     
-    // Set up next and previous buttons for each step
-    steps.forEach(step => {
-        const stepId = step.id;
-        const nextButton = document.getElementById(`${stepId}Next`);
-        const prevButton = document.getElementById(`${stepId}Prev`);
-        
-        // Handle next button click
-        if (nextButton) {
-            nextButton.addEventListener('click', () => {
-                const nextStepId = getNextStep(stepId);
-                if (nextStepId) {
-                    showStep(nextStepId);
-                } else if (stepId === 'quoteContractTerms') {
-                    // Submit form if on final step
+    // Handle Next button clicks
+    nextButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Get the current step ID from the button's ID
+            const stepId = button.id.replace('Next', '');
+            const stepConfig = getConfig(stepId);
+            
+            if (!stepConfig) {
+                console.error(`No configuration found for step ${stepId}`);
+                return;
+            }
+            
+            if (stepConfig.type === 'finalSubmit') {
+                // For the final submit step, we'll handle it here instead of navigating
+                console.log('Final submit step - calling submitQuote');
+                
+                // We only want to use our local submitQuote function, 
+                // not the one from submission.js which would cause a double API call
+                if (button.id === 'quoteContractTermsNext') {
                     submitQuote();
+                    return; // Important: don't continue with normal navigation
                 }
-            });
-        }
-        
-        // Handle previous button click
-        if (prevButton) {
-            prevButton.addEventListener('click', () => {
-                const prevStepId = getPreviousStep(stepId);
-                if (prevStepId) {
-                    showStep(prevStepId);
-                }
-            });
-        }
+            }
+            
+            // For normal steps, determine next step and navigate
+            const nextStepId = getNextStep(stepId);
+            if (nextStepId) {
+                showStep(nextStepId);
+            }
+        });
+    });
+    
+    // Handle Previous button clicks
+    prevButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Get the current step ID from the button's ID
+            const stepId = button.id.replace('Prev', '');
+            
+            // Determine previous step and navigate
+            const prevStepId = getPreviousStep(stepId);
+            if (prevStepId) {
+                showStep(prevStepId);
+            }
+        });
     });
 }
 
@@ -1683,38 +1700,48 @@ async function submitQuote() {
             console.log("Using mock location identifier for testing");
         }
         
-        // Based on error messages, the API expects these fields at the top level
-        const requestBody = {
-            // Required top-level objects
-            locationIdentifier: {...api.locationIdentifier},
-            btQuoteParams: {
-                // Copy existing params
-                ...api.btQuoteParams,
-                
-                // Ensure required values have defaults
-                serviceType: api.btQuoteParams.serviceType || "single",
-                circuitInterface: api.btQuoteParams.circuitInterface || "1 Gbit/s",
-                circuitBandwidth: formatBandwidth(api.btQuoteParams.circuitBandwidth) || "100 Mbit/s",
-                numberOfIpAddresses: api.btQuoteParams.numberOfIpAddresses || "Block /29 (8 LAN IP Addresses)",
-                preferredIpBackbone: api.btQuoteParams.preferredIpBackbone || "BT",
-                
-                // API requires these fields even for single internet
-                circuitTwoBandwidth: api.btQuoteParams.circuitTwoBandwidth || "100 Mbit/s",
-                dualInternetConfig: api.btQuoteParams.dualInternetConfig || "Active / Active"
-            },
-            securityQuoteParams: {
-                // Set all required boolean fields to false by default if null
-                secureIpDelivery: api.securityQuoteParams?.secureIpDelivery === true,
-                ztnaRequired: api.securityQuoteParams?.ztnaRequired === true,
-                noOfZtnaUsers: api.securityQuoteParams?.noOfZtnaUsers || 0,
-                threatPreventionRequired: api.securityQuoteParams?.threatPreventionRequired === true,
-                casbRequired: api.securityQuoteParams?.casbRequired === true,
-                dlpRequired: api.securityQuoteParams?.dlpRequired === true,
-                rbiRequired: api.securityQuoteParams?.rbiRequired === true
-            },
+        // Create the structure required by the API
+        const btQuoteParams = {
+            // Copy existing params
+            ...api.btQuoteParams,
             
-            // Contract term as a number at top level
-            contractTermMonths: parseInt(api.btQuoteParams.contractTermMonths, 10) || 36
+            // Ensure required values have defaults
+            serviceType: api.btQuoteParams.serviceType || "single",
+            circuitInterface: api.btQuoteParams.circuitInterface || "1 Gbit/s",
+            circuitBandwidth: formatBandwidth(api.btQuoteParams.circuitBandwidth) || "100 Mbit/s",
+            numberOfIpAddresses: api.btQuoteParams.numberOfIpAddresses || "Block /29 (8 LAN IP Addresses)",
+            preferredIpBackbone: api.btQuoteParams.preferredIpBackbone || "BT",
+            
+            // API requires these fields even for single internet
+            circuitTwoBandwidth: api.btQuoteParams.circuitTwoBandwidth || "100 Mbit/s",
+            dualInternetConfig: api.btQuoteParams.dualInternetConfig || "Active / Active"
+        };
+        
+        const securityQuoteParams = {
+            // Set all required boolean fields to false by default if null
+            secureIpDelivery: api.securityQuoteParams?.secureIpDelivery === true,
+            ztnaRequired: api.securityQuoteParams?.ztnaRequired === true,
+            noOfZtnaUsers: api.securityQuoteParams?.noOfZtnaUsers || 0,
+            threatPreventionRequired: api.securityQuoteParams?.threatPreventionRequired === true,
+            casbRequired: api.securityQuoteParams?.casbRequired === true,
+            dlpRequired: api.securityQuoteParams?.dlpRequired === true,
+            rbiRequired: api.securityQuoteParams?.rbiRequired === true
+        };
+        
+        // Structure the request body with fields at both top level and nested
+        const requestBody = {
+            // Top level fields (seems to be what the API is expecting based on error)
+            locationIdentifier: {...api.locationIdentifier},
+            btQuoteParams: btQuoteParams,
+            securityQuoteParams: securityQuoteParams,
+            contractTermMonths: parseInt(api.btQuoteParams.contractTermMonths, 10) || 36,
+            
+            // Also include nested formQuoteItem just in case
+            formQuoteItem: {
+                locationIdentifier: {...api.locationIdentifier},
+                btQuoteParams: btQuoteParams,
+                securityQuoteParams: securityQuoteParams
+            }
         };
         
         // Log the full request for debugging
