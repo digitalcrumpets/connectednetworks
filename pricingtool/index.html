@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connected Networks Quote Form</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>Get Your Business Connectivity Quote</h1>
+
+        <!-- Initial Postcode Lookup View -->
+        <div id="initialView" class="initial-view">
+            <div class="postcode-container">
+                <h2>Enter your postcode to get started</h2>
+                <p>We'll use this to check service availability at your location.</p>
+                
+                <div class="address-lookup-form">
+                    <div class="postcode-lookup-group">
+                        <input type="text" id="userPostcode" placeholder="Enter Postcode (e.g., SW1A 0AA)" class="text-input" maxlength="8" autocomplete="postal-code" required />
+                        <button id="lookupAddressButton" class="button primary" type="button">Lookup Address</button>
+                        <div id="addressLookupError" class="error-message" style="display:none;"></div>
+                    </div>
+                    <div id="addressLookupLoader" class="loader" style="display: none;"></div>
+                </div>
+                
+                <div id="previousQuoteSection" style="display: none;">
+                    <hr>
+                    <h3>Previous Quote Available</h3>
+                    <p>We've found a previous quote in progress.</p>
+                    <button id="retrievePrevQuote" class="button secondary">Resume Previous Quote</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Lookup Modal -->
+        <div id="addressLookupModal" class="modal">
+            <div class="modal-content address-modal">
+                <span class="close-modal" id="closeAddressModal">&times;</span>
+                <h2>Select Your Address</h2>
+                <p>Please select your address from the list below.</p>
+                <div id="postcodeResults" class="address-results">
+                    <!-- Addresses will be populated here by JS -->
+                </div>
+                <div id="manualAddressEntry" class="manual-entry" style="display: none;">
+                    <hr>
+                    <h3>Can't find your address?</h3>
+                    <button id="selectAddressButton" class="button secondary">Select Address</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quote Questions Modal -->
+        <div id="quoteQuestionsModal" class="modal" style="display: none;">
+            <div class="modal-content quote-modal">
+                <span class="close-modal" id="closeQuoteModal">&times;</span>
+                <div class="quote-header">
+                    <h2>Your Connectivity Quote</h2>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progressBarFill"></div>
+                        </div>
+                        <div class="progress-bar-text" id="progressBarText"></div>
+                    </div>
+                </div>
+
+                <div class="form-content">
+                    <div class="form-steps">
+                        <!-- All quote steps will be here -->
+
+                        <!-- Step 2: Service Type -->
+                        <section id="quoteServiceType" class="quotequestionssection">
+                            <h2>Service Type</h2>
+                            <p>Choose the type of internet service you require.</p>
+                            <div class="quotequestionscardcontainer">
+                                <div class="quotequestionscarditem" data-value="single">Single Internet</div>
+                                <div class="quotequestionscarditem" data-value="dual">Dual Internet</div>
+                            </div>
+                            <div class="error-message" id="step-quoteServiceType-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteServiceTypePrev" class="button secondary">Previous</button>
+                                <button id="quoteServiceTypeNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 3: Preferred IP Access (Single/Dual) -->
+                        <section id="quotePreferredIpAccess" class="quotequestionssection">
+                            <h2>Preferred IP Access</h2>
+                            <p>Select your preferred IP backbone configuration.</p>
+                            <div class="quotequestionscardcontainer">
+                                <div class="quotequestionscarditem" data-value="BT">BT</div>
+                                <div class="quotequestionscarditem" data-value="Colt">Colt</div>
+                                <div class="quotequestionscarditem" data-value="Lumen">Lumen</div>
+                                <div class="quotequestionscarditem" data-value="PCCW">PCCW</div>
+                                <div class="quotequestionscarditem" data-value="Cogent">Cogent</div>
+                                <div class="quotequestionscarditem" data-value="Any">Any</div>
+                            </div>
+                            <div class="error-message" id="step-quotePreferredIpAccess-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quotePreferredIpAccessPrev" class="button secondary">Previous</button>
+                                <button id="quotePreferredIpAccessNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 4: Circuit Interface -->
+                        <section id="quoteEtherwayBandwidth" class="quotequestionssection">
+                            <h2>Circuit Interface</h2>
+                            <p>Select the interface type for your connection.</p>
+                            
+                            <div class="circuit-bearer-buttons">
+                                <button id="quote1GbitButton" class="circuit-button">1Gbit Bearer</button>
+                                <button id="quote10GbitButton" class="circuit-button">10Gbit Bearer</button>
+                            </div>
+                            
+                            <div id="quote1GbitOptions" class="interface-options" style="display: none;">
+                                <h3>1Gbit Interface Options</h3>
+                                <div class="quotequestionscardcontainer">
+                                    <div class="quotequestionscarditem" data-value="1000BT Copper">1000BT Copper</div>
+                                    <div class="quotequestionscarditem" data-value="1000BASE-LX">1000BASE-LX (Fibre)</div>
+                                    <div class="quotequestionscarditem" data-value="1000BASE-SX">1000BASE-SX (Fibre)</div>
+                                </div>
+                            </div>
+
+                            <div id="quote10GbitOptions" class="interface-options" style="display: none;">
+                                <h3>10Gbit Interface Options</h3>
+                                <div class="quotequestionscardcontainer">
+                                    <div class="quotequestionscarditem" data-value="10GBASE-LR">10GBASE-LR (Fibre)</div>
+                                    <div class="quotequestionscarditem" data-value="10GBASE-SR">10GBASE-SR (Fibre)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="error-message" id="step-quoteEtherwayBandwidth-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteEtherwayBandwidthPrev" class="button secondary">Previous</button>
+                                <button id="quoteEtherwayBandwidthNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 5: Circuit Bandwidth (Etherflow) -->
+                        <section id="quoteEtherflowBandwidth" class="quotequestionssection">
+                            <h2>Circuit Bandwidth</h2>
+                            <p>Select the desired bandwidth for your primary circuit.</p>
+                            <!-- Dropdowns shown/hidden based on Interface Selection -->
+                            <div id="quoteEtherflow1GbitDropdown" class="quotequestionsdropdown" style="display: none;">
+                                <button type="button" class="quotequestionsdropdowntoggle" aria-haspopup="listbox" aria-expanded="false">
+                                    <span>Select Bandwidth (1Gbps Interface)</span>
+                                    <div>Choose...</div>
+                                    <img src="https://assets.website-files.com/65298ff0e46a87e81105617f/652e78633806611563f83a28_Chevron%20Down.svg" loading="lazy" alt="" class="dropdownicon">
+                                </button>
+                                <ul class="quotequestionsdropdownlist" role="listbox" style="display: none;">
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">100 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">200 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">300 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">400 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">500 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">600 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">700 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">800 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">900 Mbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">1 Gbit/s</a></li>
+                                </ul>
+                            </div>
+                            <div id="quoteEtherflow10GbitDropdown" class="quotequestionsdropdown" style="display: none;">
+                                <button type="button" class="quotequestionsdropdowntoggle" aria-haspopup="listbox" aria-expanded="false">
+                                    <span>Select Bandwidth (10Gbps Interface)</span>
+                                    <div>Choose...</div>
+                                    <img src="https://assets.website-files.com/65298ff0e46a87e81105617f/652e78633806611563f83a28_Chevron%20Down.svg" loading="lazy" alt="" class="dropdownicon">
+                                </button>
+                                <ul class="quotequestionsdropdownlist" role="listbox" style="display: none;">
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">1 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">2 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">3 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">4 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">5 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">6 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">7 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">8 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">9 Gbit/s</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">10 Gbit/s</a></li>
+                                </ul>
+                            </div>
+                            <div class="error-message" id="step-quoteEtherflowBandwidth-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteEtherflowBandwidthPrev" class="button secondary">Previous</button>
+                                <button id="quoteEtherflowBandwidthNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 6: Dual Config (Conditional) -->
+                        <section id="quoteConfiguration" class="quotequestionssection">
+                            <h2>Dual Internet Configuration</h2>
+                            <p>How should the dual connections be configured?</p>
+                            <div class="quotequestionscardcontainer">
+                                <div class="quotequestionscarditem" data-value="Active / Passive">Active / Passive</div>
+                                <div class="quotequestionscarditem" data-value="Active / Active">Active / Active</div>
+                            </div>
+                            <div class="error-message" id="step-quoteConfiguration-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteConfigurationPrev" class="button secondary">Previous</button>
+                                <button id="quoteConfigurationNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 7: Diverse IP Network (Conditional) -->
+                        <section id="quoteDiverseIpNetwork" class="quotequestionssection">
+                            <h2>Diverse IP Backbone (Active/Active)</h2>
+                            <p>Select your preferred diverse IP backbone configuration.</p>
+                            <div class="quotequestionscardcontainer">
+                                <div class="quotequestionscarditem" data-value="BT">BT</div>
+                                <div class="quotequestionscarditem" data-value="Colt">Colt</div>
+                                <div class="quotequestionscarditem" data-value="Lumen">Lumen</div>
+                                <div class="quotequestionscarditem" data-value="PCCW">PCCW</div>
+                                <div class="quotequestionscarditem" data-value="Cogent">Cogent</div>
+                                <div class="quotequestionscarditem" data-value="Any">Any</div>
+                            </div>
+                            <div class="error-message" id="step-quoteDiverseIpNetwork-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteDiverseIpNetworkPrev" class="button secondary">Previous</button>
+                                <button id="quoteDiverseIpNetworkNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 8: Circuit 2 Bandwidth (Conditional) -->
+                        <section id="quoteCircuit2Bandwidth" class="quotequestionssection">
+                            <h2>Circuit 2 Bandwidth (Active/Active)</h2>
+                            <p>Select the desired bandwidth for your second circuit.</p>
+                            <!-- Uses the same dropdown types as Circuit 1 but with different IDs -->
+                            <div id="quoteCircuit21GbitDropdown" class="quotequestionsdropdown" style="display: none;">
+                                <button type="button" class="quotequestionsdropdowntoggle" aria-haspopup="listbox" aria-expanded="false">
+                                    <span>Select Bandwidth (1Gbps Interface)</span>
+                                    <div>Choose...</div>
+                                    <img src="https://assets.website-files.com/65298ff0e46a87e81105617f/652e78633806611563f83a28_Chevron%20Down.svg" loading="lazy" alt="" class="dropdownicon">
+                                </button>
+                                <ul class="quotequestionsdropdownlist" role="listbox" style="display: none;">
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">100 Mbit/s</a></li>
+                                    <!-- Same options as Circuit 1 -->
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">1 Gbit/s</a></li>
+                                </ul>
+                            </div>
+                            <div id="quoteCircuit210GbitDropdown" class="quotequestionsdropdown" style="display: none;">
+                                <button type="button" class="quotequestionsdropdowntoggle" aria-haspopup="listbox" aria-expanded="false">
+                                    <span>Select Bandwidth (10Gbps Interface)</span>
+                                    <div>Choose...</div>
+                                    <img src="https://assets.website-files.com/65298ff0e46a87e81105617f/652e78633806611563f83a28_Chevron%20Down.svg" loading="lazy" alt="" class="dropdownicon">
+                                </button>
+                                <ul class="quotequestionsdropdownlist" role="listbox" style="display: none;">
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">1 Gbit/s</a></li>
+                                    <!-- Same options as Circuit 1 -->
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">10 Gbit/s</a></li>
+                                </ul>
+                            </div>
+                            <div class="error-message" id="step-quoteCircuit2Bandwidth-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteCircuit2BandwidthPrev" class="button secondary">Previous</button>
+                                <button id="quoteCircuit2BandwidthNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 9: Number of IPs -->
+                        <section id="quoteNumberOfIPs" class="quotequestionssection">
+                            <h2>Number of IP Addresses</h2>
+                            <p>How many usable IP addresses do you need?</p>
+                            <div id="quoteNumberOfIPAddresses" class="quotequestionsdropdown">
+                                <button type="button" class="quotequestionsdropdowntoggle" aria-haspopup="listbox" aria-expanded="false">
+                                    <span>Select Number of IPs</span>
+                                    <div>Choose...</div>
+                                    <img src="https://assets.website-files.com/65298ff0e46a87e81105617f/652e78633806611563f83a28_Chevron%20Down.svg" loading="lazy" alt="" class="dropdownicon">
+                                </button>
+                                <ul class="quotequestionsdropdownlist" role="listbox" style="display: none;">
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">Block /29 (8 LAN IP Addresses)</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">Block /28 (16 LAN IP Addresses)</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">Block /27 (32 LAN IP Addresses)</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">Block /26 (64 LAN IP Addresses)</a></li>
+                                    <li role="option"><a href="#" class="quotequestionsdropdownlink">Block /25 (128 LAN IP Addresses)</a></li>
+                                </ul>
+                            </div>
+                            <div class="error-message" id="step-quoteNumberOfIPs-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteNumberOfIPsPrev" class="button secondary">Previous</button>
+                                <button id="quoteNumberOfIPsNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- === Security Section (Conditional Steps) === -->
+
+                        <!-- Step 10: Secure IP Delivery -->
+                        <section id="quoteSecureIpDelivery" class="quotequestionssection">
+                            <h2>Add Security?</h2>
+                            <p>Would you like to add Secure IP Delivery security features to your quote?</p>
+                            <div class="quotequestionscardcontainer yesno">
+                                <div id="quoteSecureYes" class="quotequestionscarditem">Yes</div>
+                                <div id="quoteSecureNo" class="quotequestionscarditem">No</div>
+                            </div>
+                            <div class="error-message" id="step-quoteSecureIpDelivery-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteSecureIpDeliveryPrev" class="button secondary">Previous</button>
+                                <button id="quoteSecureIpDeliveryNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 11: ZTNA Required -->
+                        <section id="quoteZTNARequired" class="quotequestionssection">
+                            <h2>Zero Trust Network Access (ZTNA)</h2>
+                            <p>Do you require ZTNA?</p>
+                            <div class="quotequestionscardcontainer yesno">
+                                <div id="quoteZTNAYes" class="quotequestionscarditem">Yes</div>
+                                <div id="quoteZTNANo" class="quotequestionscarditem">No</div>
+                            </div>
+                            <div class="error-message" id="step-quoteZTNARequired-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteZTNARequiredPrev" class="button secondary">Previous</button>
+                                <button id="quoteZTNARequiredNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 12: ZTNA Users -->
+                        <section id="quoteZTNAUsers" class="quotequestionssection">
+                            <h2>Number of ZTNA Users</h2>
+                            <p>How many users require ZTNA?</p>
+                            <input type="number" id="quoteZTNAUsersInput-2" class="text-input" placeholder="Enter number of users (min 1)" min="1">
+                            <div class="error-message" id="step-quoteZTNAUsers-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteZTNAUsersPrev" class="button secondary">Previous</button>
+                                <button id="quoteZTNAUsersNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 13: Threat Prevention -->
+                        <section id="quoteThreatPrevention" class="quotequestionssection">
+                            <h2>Threat Prevention</h2>
+                            <p>Do you require Threat Prevention?</p>
+                            <div class="quotequestionscardcontainer yesno">
+                                <div id="quoteThreatYes" class="quotequestionscarditem">Yes</div>
+                                <div id="quoteThreatNo" class="quotequestionscarditem">No</div>
+                            </div>
+                            <div class="error-message" id="step-quoteThreatPrevention-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteThreatPreventionPrev" class="button secondary">Previous</button>
+                                <button id="quoteThreatPreventionNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 14: CASB Required -->
+                        <section id="quoteCASBRequired" class="quotequestionssection">
+                            <h2>Cloud Access Security Broker (CASB)</h2>
+                            <p>Do you require CASB?</p>
+                            <div class="quotequestionscardcontainer yesno">
+                                <div id="quoteCASBYes" class="quotequestionscarditem">Yes</div>
+                                <div id="quoteCASBNo" class="quotequestionscarditem">No</div>
+                            </div>
+                            <div class="error-message" id="step-quoteCASBRequired-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteCASBRequiredPrev" class="button secondary">Previous</button>
+                                <button id="quoteCASBRequiredNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 15: DLP Required -->
+                        <section id="quoteDLPRequired" class="quotequestionssection">
+                            <h2>Data Loss Prevention (DLP)</h2>
+                            <p>Do you require DLP?</p>
+                            <div class="quotequestionscardcontainer yesno">
+                                <div id="quoteDLPYes" class="quotequestionscarditem">Yes</div>
+                                <div id="quoteDLPNo" class="quotequestionscarditem">No</div>
+                            </div>
+                            <div class="error-message" id="step-quoteDLPRequired-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteDLPRequiredPrev" class="button secondary">Previous</button>
+                                <button id="quoteDLPRequiredNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 16: RBI Required -->
+                        <section id="quoteRBIRequired" class="quotequestionssection">
+                            <h2>Remote Browser Isolation (RBI)</h2>
+                            <p>Do you require RBI?</p>
+                            <div class="quotequestionscardcontainer yesno">
+                                <div id="quoteRBIYes" class="quotequestionscarditem">Yes</div>
+                                <div id="quoteRBINo" class="quotequestionscarditem">No</div>
+                            </div>
+                            <div class="error-message" id="step-quoteRBIRequired-error"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteRBIRequiredPrev" class="button secondary">Previous</button>
+                                <button id="quoteRBIRequiredNext" class="button primary" disabled>Next</button>
+                            </div>
+                        </section>
+
+                        <!-- Step 17: Contract Term -->
+                        <section id="quoteContractTerms" class="quotequestionssection">
+                            <h2>Contract Term</h2>
+                            <p>Select the desired contract length.</p>
+                            <div class="quotequestionscardcontainer">
+                                <div class="quotequestionscarditem" data-value="12">12 Months</div>
+                                <div class="quotequestionscarditem" data-value="36">36 Months</div>
+                                <div class="quotequestionscarditem" data-value="60">60 Months</div>
+                            </div>
+                            <div class="error-message" id="step-quoteContractTerms-error"></div>
+                            <div id="submissionError" class="error-message"></div>
+                            <div class="navigation-buttons">
+                                <button id="quoteContractTermsPrev" class="button secondary">Previous</button>
+                                <button id="quoteContractTermsNext" class="button primary" disabled>Submit Quote</button>
+                            </div>
+                            <div id="quotePOSTLoader" class="loader" style="display: none;"></div>
+                            <div id="apiResponseText" class="response-message" style="display: none;"></div>
+                        </section>
+                    </div>
+
+                    <!-- Summary Panel -->
+                    <aside class="summary-panel">
+                        <h2>Quote Summary</h2>
+                        <div id="summaryContent">
+                            <!-- Summary content dynamically generated by JS -->
+                            <p>Your selections will appear here.</p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Loader -->
+        <div id="globalLoader" class="loader-overlay" style="display: none;">
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript -->
+    <script type="module" src="./js/main.js"></script>
+    <script src="./js/flowController.js?v=20250420211800" type="module"></script>
+
+</body>
+</html>
