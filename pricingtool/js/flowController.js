@@ -71,6 +71,13 @@ function loadPreviousQuote() {
         if (savedData) {
             const parsedData = JSON.parse(savedData);
             
+            // Format the saved date/time if available
+            let savedTimeInfo = '';
+            if (parsedData.savedAt) {
+                const savedDate = new Date(parsedData.savedAt);
+                savedTimeInfo = ` (saved on ${savedDate.toLocaleDateString()} at ${savedDate.toLocaleTimeString()})`;
+            }
+            
             // Only show resume button if there's substantial data and contract term wasn't set
             // (meaning the quote wasn't fully submitted)
             if (parsedData.btQuoteParams && 
@@ -79,14 +86,40 @@ function loadPreviousQuote() {
                 (!parsedData.btQuoteParams.contractTermMonths || 
                  parsedData.btQuoteParams.contractTermMonths <= 0)) {
                 
-                document.getElementById('previousQuoteSection').style.display = 'block';
+                // Show the previous quote section
+                const previousQuoteSection = document.getElementById('previousQuoteSection');
+                if (previousQuoteSection) {
+                    // Update the content with saved time info
+                    const infoText = previousQuoteSection.querySelector('p');
+                    if (infoText) {
+                        infoText.textContent = `We've found a previous quote in progress${savedTimeInfo}.`;
+                    }
+                    
+                    // Add a clear button next to resume
+                    const resumeButton = previousQuoteSection.querySelector('#retrievePrevQuote');
+                    if (resumeButton && !document.getElementById('clearPrevQuote')) {
+                        const clearButton = document.createElement('button');
+                        clearButton.id = 'clearPrevQuote';
+                        clearButton.className = 'button secondary clear-button';
+                        clearButton.textContent = 'Clear Saved Quote';
+                        resumeButton.parentNode.insertBefore(clearButton, resumeButton.nextSibling);
+                        
+                        // Add event listener for clearing
+                        clearButton.addEventListener('click', clearSavedQuote);
+                    }
+                    
+                    previousQuoteSection.style.display = 'block';
+                    
+                    // Set up event listener for resume button
+                    document.getElementById('retrievePrevQuote').addEventListener('click', () => {
+                        api = parsedData;
+                        mapSavedDataToUI();
+                        openQuotesModal();
+                    });
+                }
                 
-                // Set up event listener for resume button
-                document.getElementById('retrievePrevQuote').addEventListener('click', () => {
-                    api = parsedData;
-                    mapSavedDataToUI();
-                    openQuotesModal();
-                });
+                // Also show the saved message if we're not in the resuming flow
+                showQuoteSavedMessage();
             }
         }
     } catch (error) {
@@ -677,14 +710,83 @@ function openQuotesModal() {
 // Save current API state to localStorage
 function saveApiState() {
     try {
-        localStorage.setItem('quoteFormData', JSON.stringify(api));
+        // Add a timestamp to know when the quote was saved
+        const quoteToSave = {
+            ...api,
+            savedAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('quoteFormData', JSON.stringify(quoteToSave));
+        
+        // Show the message that a quote is saved (if we're not in the modal)
+        const modal = document.getElementById('quoteQuestionsModal');
+        if (modal && modal.style.display !== 'block') {
+            showQuoteSavedMessage();
+        }
     } catch (error) {
         console.error('Error saving form data:', error);
         // Continue without saving
     }
 }
 
-// Set up form navigation between steps
+// Show a message that a quote has been saved
+function showQuoteSavedMessage() {
+    // Check if the message already exists
+    let messageElement = document.getElementById('quoteSavedMessage');
+    
+    if (!messageElement) {
+        // Create the message element if it doesn't exist
+        messageElement = document.createElement('div');
+        messageElement.id = 'quoteSavedMessage';
+        messageElement.className = 'quote-saved-message';
+        messageElement.innerHTML = `
+            <p>Your quote has been saved. <a href="#" id="clearQuoteLink">Clear saved quote</a></p>
+        `;
+        
+        // Insert it after the previousQuoteSection
+        const previousQuoteSection = document.getElementById('previousQuoteSection');
+        if (previousQuoteSection && previousQuoteSection.parentNode) {
+            previousQuoteSection.parentNode.insertBefore(messageElement, previousQuoteSection.nextSibling);
+            
+            // Add event listener to the clear link
+            document.getElementById('clearQuoteLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                clearSavedQuote();
+            });
+        }
+    }
+    
+    // Show the message
+    messageElement.style.display = 'block';
+}
+
+// Clear the saved quote from localStorage
+function clearSavedQuote() {
+    try {
+        localStorage.removeItem('quoteFormData');
+        
+        // Hide the saved quote message and previous quote section
+        const messageElement = document.getElementById('quoteSavedMessage');
+        if (messageElement) {
+            messageElement.style.display = 'none';
+        }
+        
+        const previousQuoteSection = document.getElementById('previousQuoteSection');
+        if (previousQuoteSection) {
+            previousQuoteSection.style.display = 'none';
+        }
+        
+        // Reset the API state
+        resetApiState();
+        
+        // Show a confirmation message
+        alert('Your saved quote has been cleared.');
+    } catch (error) {
+        console.error('Error clearing saved quote:', error);
+    }
+}
+
+// Set up event listeners
 function setupStepNavigation() {
     const nextButtons = document.querySelectorAll('[id$="Next"]');
     const prevButtons = document.querySelectorAll('[id$="Prev"]');
