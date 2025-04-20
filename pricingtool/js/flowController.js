@@ -708,7 +708,23 @@ function setupStepNavigation() {
                 // We only want to use our local submitQuote function, 
                 // not the one from submission.js which would cause a double API call
                 if (button.id === 'quoteContractTermsNext') {
-                    submitQuote();
+                    // Set a flag to prevent multiple API calls due to race conditions
+                    if (window.isAlreadySubmitting) {
+                        console.log('Already processing a submission, ignoring additional click');
+                        return;
+                    }
+                    
+                    window.isAlreadySubmitting = true;
+                    
+                    // Add a small delay before calling submitQuote to avoid race conditions
+                    setTimeout(() => {
+                        submitQuote();
+                        // Reset flag after 2 seconds to allow future submissions if needed
+                        setTimeout(() => {
+                            window.isAlreadySubmitting = false;
+                        }, 2000);
+                    }, 100);
+                    
                     return; // Important: don't continue with normal navigation
                 }
             }
@@ -1686,14 +1702,24 @@ async function submitQuote() {
     if (responseText) responseText.style.display = 'none';
     
     try {
+        // Log the current API state for debugging
+        console.log('Current API state before submission:', JSON.stringify(api, null, 2));
+        
         // Validate all required fields are set
         if (!api.btQuoteParams.contractTermMonths) {
             throw new Error('Please select a contract term before submitting.');
         }
         
-        // Validate location identifier
-        if (!api.locationIdentifier || !api.locationIdentifier.id) {
-            throw new Error('Missing location identifier. Please start again by entering a postcode.');
+        // More lenient location identifier check - it could be an empty string which is falsy
+        // First, check if the property exists
+        if (!api.locationIdentifier) {
+            throw new Error('Location identifier object is missing. Please start again.');
+        }
+        
+        // Now check if it has an id (which could be an empty string)
+        if (!api.locationIdentifier.id && api.locationIdentifier.id !== '') {
+            console.log('Location identifier issue:', api.locationIdentifier);
+            throw new Error('Location identifier ID is missing. Please select an address.');
         }
         
         // Create the structure required by the API
