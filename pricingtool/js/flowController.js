@@ -1691,13 +1691,9 @@ async function submitQuote() {
             throw new Error('Please select a contract term before submitting.');
         }
         
-        // Handle missing location identifier by creating a mock one for testing
+        // Validate location identifier
         if (!api.locationIdentifier || !api.locationIdentifier.id) {
-            api.locationIdentifier = {
-                id: "test-location-123",
-                postcode: "SW1A 1AA"
-            };
-            console.log("Using mock location identifier for testing");
+            throw new Error('Missing location identifier. Please start again by entering a postcode.');
         }
         
         // Create the structure required by the API
