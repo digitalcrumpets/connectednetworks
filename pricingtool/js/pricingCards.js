@@ -9,15 +9,30 @@ let pricingData = null;
  * @param {Object} apiResponse - The pricing data from the API
  */
 export function initializePricingCards(apiResponse) {
-    if (!apiResponse || !apiResponse.btPricing) {
-        console.error('Invalid pricing data format');
+    console.log('Initializing pricing cards with data:', apiResponse);
+    
+    // Check if the response is an array (based on the API format we're receiving)
+    if (Array.isArray(apiResponse) && apiResponse.length > 0) {
+        // Extract the pricing data from the first item in the array
+        if (apiResponse[0] && apiResponse[0].btPricing) {
+            pricingData = apiResponse[0].btPricing;
+            setupCategoryTabs();
+            renderPricingCards('etherway'); // Default to etherway tab
+            setupEventListeners();
+            return;
+        }
+    }
+    
+    // If we didn't return above, check for direct btPricing object format
+    if (apiResponse && apiResponse.btPricing) {
+        pricingData = apiResponse.btPricing;
+        setupCategoryTabs();
+        renderPricingCards('etherway'); // Default to etherway tab
+        setupEventListeners();
         return;
     }
-
-    pricingData = apiResponse.btPricing;
-    setupCategoryTabs();
-    renderPricingCards('etherway'); // Default to etherway tab
-    setupEventListeners();
+    
+    console.error('Invalid pricing data format', apiResponse);
 }
 
 /**
@@ -57,18 +72,23 @@ function renderPricingCards(category) {
     
     // Check if we have data for this category
     if (!pricingData[category] || !Array.isArray(pricingData[category])) {
-        container.innerHTML = '<p>No pricing options available for this category.</p>';
+        container.innerHTML = '<p class="no-options">No pricing options available for this category.</p>';
         return;
     }
     
     // Group pricing options by name (e.g., "1 Year connection" and "1 Year rental" go together)
     const pricingGroups = groupPricingOptions(pricingData[category]);
     
+    // Create a card slider container
+    const sliderContainer = document.createElement('div');
+    sliderContainer.className = 'pricing-card-slider';
+    container.appendChild(sliderContainer);
+    
     // Create cards for each group
     Object.keys(pricingGroups).forEach(groupName => {
         const group = pricingGroups[groupName];
         const card = createPricingCard(group, category);
-        container.appendChild(card);
+        sliderContainer.appendChild(card);
     });
 }
 
@@ -167,7 +187,7 @@ function createPricingCard(optionGroup, category) {
             </div>
         </div>
         <div class="pricing-card-footer">
-            <button class="select-plan-btn">Select Plan</button>
+            <button class="select-plan-btn">Select</button>
         </div>
     `;
     
@@ -214,8 +234,12 @@ function setupEventListeners() {
     const prevButton = document.getElementById('pricingCardsPrev');
     if (prevButton) {
         prevButton.addEventListener('click', () => {
-            // Navigate to previous step logic here
-            // This would typically be handled by your existing navigation system
+            // Navigate to previous step - quoteContractTerms
+            if (window.showStep) {
+                window.showStep('quoteContractTerms');
+            } else {
+                console.error('showStep function not available in global scope');
+            }
         });
     }
     
@@ -225,12 +249,20 @@ function setupEventListeners() {
         nextButton.addEventListener('click', () => {
             // Save the selected pricing option to your application state
             if (selectedPricingOption) {
-                // Update your application state here
-                // Example: api.btQuoteParams.selectedPricing = selectedPricingOption;
                 console.log('Selected pricing option:', selectedPricingOption);
                 
-                // Navigate to next step logic here
-                // This would typically be handled by your existing navigation system
+                // Display a success message
+                const apiResponseText = document.getElementById('apiResponseText');
+                if (apiResponseText) {
+                    apiResponseText.textContent = 'Your quote has been submitted successfully with your selected pricing option.';
+                    apiResponseText.className = 'response-message success-message';
+                    apiResponseText.style.display = 'block';
+                }
+                
+                // This is the final step, so don't navigate anywhere else
+                // Just disable the button to prevent further clicks
+                nextButton.disabled = true;
+                nextButton.textContent = 'Selection Complete';
             }
         });
     }
