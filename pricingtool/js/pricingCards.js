@@ -68,7 +68,14 @@ function renderPricingCards(category) {
     
     // Reset selected option when changing categories
     selectedPricingOption = null;
-    disableButton('pricingCardsNext');
+    
+    // Get the actual button element before disabling it
+    const nextButton = document.getElementById('pricingCardsNext');
+    if (nextButton) {
+        disableButton(nextButton);
+    } else {
+        console.warn('Next button not found: pricingCardsNext');
+    }
     
     // Check if we have data for this category
     if (!pricingData[category] || !Array.isArray(pricingData[category])) {
@@ -222,8 +229,13 @@ function selectPricingCard(card) {
         options: JSON.parse(card.getAttribute('data-options'))
     };
     
-    // Enable next button
-    enableButton('pricingCardsNext');
+    // Enable next button - get the DOM element first
+    const nextButton = document.getElementById('pricingCardsNext');
+    if (nextButton) {
+        enableButton(nextButton);
+    } else {
+        console.warn('Next button not found: pricingCardsNext');
+    }
 }
 
 /**
@@ -285,5 +297,11 @@ export function resetPricingCardSelection() {
     const allCards = document.querySelectorAll('.pricing-card');
     allCards.forEach(c => c.classList.remove('selected'));
     
-    disableButton('pricingCardsNext');
+    // Disable next button - get the DOM element first
+    const nextButton = document.getElementById('pricingCardsNext');
+    if (nextButton) {
+        disableButton(nextButton);
+    } else {
+        console.warn('Next button not found: pricingCardsNext');
+    }
 }
