@@ -448,11 +448,18 @@ function setupPostcodeSearch() {
         return;
     }
     
-    // Handle lookup button click
-    lookupButton.addEventListener('click', performPostcodeLookup);
+    // Prevent multiple event listeners by removing old ones
+    const newLookupButton = lookupButton.cloneNode(true);
+    lookupButton.parentNode.replaceChild(newLookupButton, lookupButton);
+    
+    const newPostcodeInput = postcodeInput.cloneNode(true);
+    postcodeInput.parentNode.replaceChild(newPostcodeInput, postcodeInput);
+    
+    // Handle lookup button click with the fresh elements
+    newLookupButton.addEventListener('click', performPostcodeLookup);
     
     // Handle Enter key in postcode input
-    postcodeInput.addEventListener('keypress', (e) => {
+    newPostcodeInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             performPostcodeLookup();
@@ -461,7 +468,8 @@ function setupPostcodeSearch() {
     
     // Function to validate and search for postcode
     async function performPostcodeLookup() {
-        const postcode = postcodeInput.value.trim();
+        console.log('Performing postcode lookup (single call)');
+        const postcode = newPostcodeInput.value.trim();
         
         // Reset UI
         const errorDisplay = document.getElementById('addressLookUpError');
@@ -479,8 +487,28 @@ function setupPostcodeSearch() {
             return;
         }
         
-        // Reset the API state for a new search
-        resetApiState();
+        // Store the current location ID in case we need it
+        const currentLocationId = api.locationIdentifier ? api.locationIdentifier.id : null;
+        const currentPostcode = api.locationIdentifier ? api.locationIdentifier.postcode : null;
+        
+        // Only reset API if this is a brand new quote or if the user is explicitly choosing to start over
+        // Check if we're at the very beginning (no API data has been entered yet)
+        const isNewQuote = !api.btQuoteParams.serviceType && 
+                          !api.btQuoteParams.circuitInterface &&
+                          !api.btQuoteParams.circuitBandwidth;
+                          
+        if (isNewQuote) {
+            // Only for new quotes - reset the entire API state
+            resetApiState();
+            console.log('New quote - resetting API state');
+        } else {
+            console.log('Preserving existing quote data while changing address');
+            // Just reset the location identifier for address changes on existing quotes
+            api.locationIdentifier = {
+                id: null,
+                postcode: null
+            };
+        }
         
         // Show loader
         document.getElementById('addressLookupLoader').style.display = 'block';
@@ -690,6 +718,12 @@ function selectAddress(address) {
 // Open the quote questions modal and show first step
 function openQuotesModal() {
     console.log('Opening quote modal...');
+    
+    // Make sure address lookup modal is completely closed
+    const addressModal = document.getElementById('addressLookupModal');
+    if (addressModal) {
+        addressModal.style.display = 'none';
+    }
     
     const quoteModal = document.getElementById('quoteQuestionsModal');
     const initialView = document.getElementById('initialView');
@@ -1707,6 +1741,12 @@ function setupCardSelections() {
             const stepId = section.id;
             const container = e.target.closest('.quotequestionscardcontainer');
             if (!container) return; // Should not happen
+            
+            // Make sure address lookup modal is completely closed
+            const addressModal = document.getElementById('addressLookupModal');
+            if (addressModal) {
+                addressModal.style.display = 'none';
+            }
             
             const value = card.getAttribute('data-value') || card.textContent.trim();
             

@@ -421,10 +421,10 @@ a:hover {
 
 /* --- Loaders --- */
 .loader {
-    border: 3px solid rgba(0,0,0,0.1);
-    border-top: 3px solid #000;
-    width: 30px;
-    height: 30px;
+    border: 4px solid rgba(0,0,0,0.1);
+    border-top: 4px solid #000;
+    width: 40px;
+    height: 40px;
     animation: spin 1s linear infinite;
     margin: 20px auto;
     border-radius: 50%;
@@ -440,13 +440,14 @@ a:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1200;
+    pointer-events: none;
 }
 
 .loader-overlay .loader {
-    width: 50px;
-    height: 50px;
-    border-width: 5px;
+    width: 60px;
+    height: 60px;
+    border-width: 6px;
 }
 
 @keyframes spin {
@@ -721,14 +722,19 @@ a:hover {
 
 .manual-entry {
     margin-top: 20px;
-    padding-top: 10px;
+    padding: 15px;
     border-top: 1px solid var(--border-color);
     text-align: center;
 }
 
 .manual-entry h3 {
     font-size: 1.1em;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.manual-entry p {
+    margin-bottom: 0;
+    padding: 0 10px;
 }
 
 /* --- Quote Form Header --- */
@@ -1113,7 +1119,19 @@ a, a:visited, a:hover {
 
 /* Modal background: keep semi-transparent black overlay */
 .modal {
-    background-color: rgba(0,0,0,0.7) !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    /* Ensure base z-index for all modals */
+    z-index: 1000 !important;
+}
+
+/* Give quote modal higher z-index to appear above address modal */
+#quoteQuestionsModal {
+    z-index: 1100 !important;
+}
+
+/* Ensure address modal is properly hidden when not visible */
+#addressLookupModal {
+    display: none;
 }
 
 /* Remove any colored backgrounds from progress bars, etc. */
