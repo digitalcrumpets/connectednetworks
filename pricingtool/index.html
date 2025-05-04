@@ -458,7 +458,28 @@
     <script>
         // Function to send the current document height to the parent window
         function updateParentHeight() {
-            const height = document.body.scrollHeight;
+            // Get all visible modals
+            const visibleModals = Array.from(document.querySelectorAll('.modal')).filter(modal => {
+                return window.getComputedStyle(modal).display !== 'none';
+            });
+            
+            // Calculate base document height
+            let height = document.body.scrollHeight;
+            
+            // If there's a visible modal, we need to calculate differently
+            if (visibleModals.length > 0) {
+                // Get the modal content heights (plus some padding)
+                const modalHeights = visibleModals.map(modal => {
+                    const modalContent = modal.querySelector('.modal-content');
+                    return modalContent ? modalContent.offsetHeight + 100 : 0; // Add 100px padding for spacing
+                });
+                
+                // Use the max of document height or modal height + top position
+                const maxModalHeight = Math.max(...modalHeights);
+                height = Math.max(height, maxModalHeight + 200); // Add extra space for modal positioning
+            }
+            
+            // Send height to parent
             if (window.parent && window.parent !== window) {
                 window.parent.postMessage({ 
                     type: 'resize-iframe', 
@@ -489,6 +510,38 @@
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(updateParentHeight, 300);
+        });
+        
+        // Specifically handle modal open/close events
+        document.addEventListener('click', (e) => {
+            // Look for clicks on elements that trigger modals
+            if (e.target.matches('#lookupAddressButton') || 
+                e.target.closest('.close-modal') || 
+                e.target.matches('.address-results a') ||
+                e.target.classList.contains('quotequestionscarditem')) {
+                // Wait for modal animation to complete
+                setTimeout(updateParentHeight, 500);
+            }
+        });
+        
+        // Add specific listeners for known modal triggers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Address lookup modal
+            const addressModal = document.getElementById('addressLookupModal');
+            const quoteModal = document.getElementById('quoteQuestionsModal');
+            
+            // For any display changes to modals
+            const modalObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        setTimeout(updateParentHeight, 500);
+                    }
+                });
+            });
+            
+            // Observe the modals for style changes (which handle display)
+            if (addressModal) modalObserver.observe(addressModal, { attributes: true });
+            if (quoteModal) modalObserver.observe(quoteModal, { attributes: true });
         });
     </script>
 </body>
