@@ -477,6 +477,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
     margin-bottom: 20px;
     width: 100%;
     flex-wrap: wrap;
+    position: relative;
 }
 
 .postcode-lookup-group .text-input {
@@ -485,6 +486,25 @@ html body button.quotequestionsdropdowntoggle.selected div {
 
 .postcode-lookup-group button {
     white-space: nowrap;
+}
+
+.postcode-input-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    transition: opacity 0.2s;
+}
+.postcode-input-overlay[style*="display: none"] {
+    pointer-events: none;
+    opacity: 0;
 }
 
 /* --- Error Messages --- */
@@ -1334,4 +1354,89 @@ button:hover,
 button:active {
     transform: translateY(1px);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Overlay for postcode results loader */
+.postcode-results-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.75);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    transition: opacity 0.2s;
+}
+.postcode-results-overlay[style*="display: none"] {
+    pointer-events: none;
+    opacity: 0;
+}
+.postcode-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo-spinner {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Overlay for postcode results loader - fix centering */
+#postcodeResults {
+    position: relative;
+    width: 100%;
+    min-height: 180px;
+    /* Ensures overlay fills the white card */
+}
+.postcode-results-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.85);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    transition: opacity 0.2s;
+}
+.postcode-results-overlay[style*="display: none"] {
+    pointer-events: none;
+    opacity: 0;
+}
+.postcode-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo-spinner {
+    display: block;
+    margin: 0 auto;
+}
+/* Ensure modal-content is not overflow:hidden so overlay can fill */
+.modal-content.address-modal {
+    position: relative;
+    min-height: 300px;
+    overflow: visible;
+}
+
+.postcode-results-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.85);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    transition: opacity 0.2s;
 }

@@ -9,7 +9,7 @@ let selectedPostcode = null;
 
 // --- Address Lookup API Logic ---
 const fetchAddressesFromAPI = async (postcode) => {
-    showLoader('addressLookupLoader');
+    setPostcodeInputLoading(true);
     hideError('addressLookupError');
     disableButton(document.getElementById('lookupAddressButton'));
 
@@ -30,16 +30,33 @@ const fetchAddressesFromAPI = async (postcode) => {
             throw new Error(errorMessage);
         }
         const addresses = await response.json();
-        hideLoader('addressLookupLoader');
+        setPostcodeInputLoading(false);
         enableButton(document.getElementById('lookupAddressButton'));
         return Array.isArray(addresses) ? addresses : []; // Ensure it returns an array
-    } catch (error) {        hideLoader('addressLookupLoader');
+    } catch (error) {
+        setPostcodeInputLoading(false);
         enableButton(document.getElementById('lookupAddressButton'));
         console.error('Address Lookup API Error:', error);
         displayError('addressLookupError', `Lookup failed: ${error.message}. Please check the postcode or try again later.`);
         return []; // Return empty array on error
     }
 };
+
+// Show/hide postcode input overlay loader
+function setPostcodeInputLoading(isLoading) {
+    const overlay = document.getElementById('postcodeInputOverlay');
+    if (overlay) {
+        overlay.style.display = isLoading ? 'flex' : 'none';
+    }
+}
+
+// Show/hide postcode results overlay loader
+function setPostcodeResultsLoading(isLoading) {
+    const overlay = document.getElementById('postcodeResultsOverlay');
+    if (overlay) {
+        overlay.style.display = isLoading ? 'flex' : 'none';
+    }
+}
 
 // --- Display Results Logic ---
 const displayResults = (addresses) => {

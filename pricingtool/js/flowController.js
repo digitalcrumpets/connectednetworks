@@ -627,14 +627,17 @@ function setupPostcodeSearch() {
         }
         
         // Show loader
-        document.getElementById('addressLookupLoader').style.display = 'block';
+        const postcodeInputOverlay = document.getElementById('postcodeInputOverlay');
+        if (postcodeInputOverlay) postcodeInputOverlay.style.display = 'flex';
+        // document.getElementById('addressLookupLoader').style.display = 'block';
         
         try {
             // Call the address lookup API
             const addresses = await fetchAddressesFromAPI(postcode);
             
             // Hide loader
-            document.getElementById('addressLookupLoader').style.display = 'none';
+            if (postcodeInputOverlay) postcodeInputOverlay.style.display = 'none';
+            // document.getElementById('addressLookupLoader').style.display = 'none';
             
             if (addresses && addresses.length > 0) {
                 // Display addresses in the modal
@@ -651,7 +654,8 @@ function setupPostcodeSearch() {
             }
         } catch (error) {
             // Hide loader
-            document.getElementById('addressLookupLoader').style.display = 'none';
+            if (postcodeInputOverlay) postcodeInputOverlay.style.display = 'none';
+            // document.getElementById('addressLookupLoader').style.display = 'none';
             
             // Show error
             if (errorDisplay) {
@@ -1204,8 +1208,10 @@ function initializeStepElements(stepId) {
                     });
                     
                     // Enable next button
-                    const nextButton = document.getElementById('quoteEtherflowBandwidthNext');
-                    if (nextButton) enableButton(nextButton);
+                    const etherflowNextButton = document.getElementById('quoteEtherflowBandwidthNext');
+                    if (etherflowNextButton) {
+                        enableButton(etherflowNextButton);
+                    }
                 }
             }
             break;
@@ -1233,8 +1239,10 @@ function initializeStepElements(stepId) {
                     });
                     
                     // Enable next button
-                    const nextButton = document.getElementById('quoteCircuit2BandwidthNext');
-                    if (nextButton) enableButton(nextButton);
+                    const circuit2NextButton = document.getElementById('quoteCircuit2BandwidthNext');
+                    if (circuit2NextButton) {
+                        enableButton(circuit2NextButton);
+                    }
                 }
             }
             break;
@@ -1922,7 +1930,9 @@ function setupCardSelections() {
             
             // Enable the next button
             const nextButton = document.getElementById(`${stepId}Next`);
-            if (nextButton) enableButton(nextButton);
+            if (nextButton) {
+                enableButton(nextButton);
+            }
             
             // Update API state based on step
             switch (stepId) {
@@ -1980,7 +1990,9 @@ function selectCardItem(stepId, value) {
         if (cardValue.toLowerCase() === value.toLowerCase()) {
             card.classList.add('selected');
             const nextButton = document.getElementById(`${stepId}Next`);
-            if (nextButton) enableButton(nextButton);
+            if (nextButton) {
+                enableButton(nextButton);
+            }
         }
     });
 }
