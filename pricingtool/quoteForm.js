@@ -600,6 +600,9 @@ const initializeDropdownBehavior = (dropdownElement, stepId, config) => {
 
             links.forEach(l => l.classList.remove('selected'));
             link.classList.add('selected');
+            
+            // Add selected class to toggle for proper styling
+            toggle.classList.add('selected');
 
             setApiValue(config.apiKey, valueToStore);
             enableButton(nextButton);
@@ -627,10 +630,12 @@ const initializeDropdownBehavior = (dropdownElement, stepId, config) => {
 
             if (compareValue === currentValue) {
                 link.classList.add('selected');
-                 const textDisplay = toggle.querySelector('div:nth-child(2)');
-                 if (textDisplay) textDisplay.textContent = linkValue;
-                 else toggle.textContent = linkValue; // Fallback
-                 enableButton(nextButton);
+                // Add selected class to toggle for proper styling
+                toggle.classList.add('selected');
+                const textDisplay = toggle.querySelector('div:nth-child(2)');
+                if (textDisplay) textDisplay.textContent = linkValue;
+                else toggle.textContent = linkValue; // Fallback
+                enableButton(nextButton);
             }
         });
     } else {

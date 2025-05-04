@@ -256,10 +256,87 @@ a:hover {
 
 .quotequestionsdropdowntoggle div {
     flex-grow: 1;
-    color: var(--text-light); 
+    color: var(--text-light);
 }
 .quotequestionsdropdowntoggle div:not(:empty) {
-    color: var(--text-color); 
+    color: var(--text-color);
+}
+
+/* Force specific styles for all dropdown toggles regardless of other classes */
+html body .quotequestionsdropdowntoggle,
+html body button.quotequestionsdropdowntoggle,
+html body .form-container .quotequestionsdropdowntoggle,
+html body .form-steps .quotequestionsdropdowntoggle {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+    font-weight: normal !important;
+}
+
+/* Style for the div inside dropdown toggles - no border */
+html body .quotequestionsdropdowntoggle div {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    font-weight: normal !important;
+}
+
+/* Force placeholder visibility */
+html body .quotequestionsdropdowntoggle div,
+html body button.quotequestionsdropdowntoggle div {
+    display: block !important;
+    visibility: visible !important;
+    color: #333 !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    opacity: 1 !important;
+}
+
+/* When a dropdown is selected, invert the colors */
+html body .quotequestionsdropdowntoggle.selected,
+html body button.quotequestionsdropdowntoggle.selected,
+html body .quotequestionsdropdowntoggle.selected div,
+html body button.quotequestionsdropdowntoggle.selected div {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+}
+
+/* Override button colors to ensure dropdown toggles don't use button styling */
+.form-container button.quotequestionsdropdowntoggle:not(.selected),
+.form-steps button.quotequestionsdropdowntoggle:not(.selected),
+.quotequestionssection button.quotequestionsdropdowntoggle:not(.selected) {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+}
+
+/* Specific overrides for dropdowns that have conflicts */
+#quoteCircuit1GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
+#quoteCircuit10GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
+#quoteCircuit21GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
+#quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
+#quoteNumberOfIPAddresses .quotequestionsdropdowntoggle:not(.selected) {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+}
+
+/* Make sure the specific dropdown toggles with conflicts have the correct selected state */
+#quoteCircuit1GbitDropdown .quotequestionsdropdowntoggle.selected,
+#quoteCircuit1GbitDropdown .quotequestionsdropdowntoggle.selected div,
+#quoteCircuit10GbitDropdown .quotequestionsdropdowntoggle.selected,
+#quoteCircuit10GbitDropdown .quotequestionsdropdowntoggle.selected div,
+#quoteCircuit21GbitDropdown .quotequestionsdropdowntoggle.selected,
+#quoteCircuit21GbitDropdown .quotequestionsdropdowntoggle.selected div,
+#quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle.selected,
+#quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle.selected div,
+#quoteNumberOfIPAddresses .quotequestionsdropdowntoggle.selected,
+#quoteNumberOfIPAddresses .quotequestionsdropdowntoggle.selected div {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
 }
 
 .quotequestionsdropdowntoggle .dropdownicon {
@@ -758,25 +835,59 @@ a:hover {
     margin: 20px 0;
 }
 
-.circuit-button {
+/* Reset and force white background for unselected circuit buttons */
+#quote1GbitButton.circuit-button:not(.selected),
+#quote10GbitButton.circuit-button:not(.selected) {
     padding: 12px 25px;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    border-radius: var(--border-radius);
+}
+
+/* Generic circuit button class as fallback */
+.circuit-button {
+    padding: 12px 25px;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #000;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: var(--border-radius);
 }
 
 .circuit-button:hover {
-    border-color: #222;
-    box-shadow: none;
+    background-color: #f5f5f5;
+    border-color: #000;
 }
 
+/* Higher specificity for selected buttons */
+#quote1GbitButton.circuit-button.selected,
+#quote10GbitButton.circuit-button.selected {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+}
+
+/* Generic selected state as fallback */
 .circuit-button.selected {
     background-color: #000;
     color: #fff;
     border-color: #000;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
 }
 
 .interface-options {

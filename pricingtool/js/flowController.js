@@ -1,5 +1,36 @@
 // Main controller for the quote form flow
-document.addEventListener('DOMContentLoaded', initializeQuoteForm);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeQuoteForm();
+    
+    // Directly set dropdown placeholder text
+    setTimeout(() => {
+        // Circuit 1 dropdowns
+        setDropdownText('quoteEtherflow1GbitDropdown', 'Select Circuit Bandwidth');
+        setDropdownText('quoteEtherflow10GbitDropdown', 'Select Circuit Bandwidth');
+        
+        // Circuit 2 dropdowns
+        setDropdownText('quoteCircuit21GbitDropdown', 'Select Circuit 2 Bandwidth');
+        setDropdownText('quoteCircuit210GbitDropdown', 'Select Circuit 2 Bandwidth');
+        
+        // IP address dropdown
+        setDropdownText('quoteNumberOfIPAddresses', 'Select Number of IP Addresses');
+    }, 100);
+});
+
+// Helper function to set dropdown text
+function setDropdownText(dropdownId, text) {
+    const dropdown = document.getElementById(dropdownId);
+    if (dropdown) {
+        const toggle = dropdown.querySelector('.quotequestionsdropdowntoggle');
+        if (toggle) {
+            const div = toggle.querySelector('div');
+            if (div) {
+                div.textContent = text;
+                console.log(`Set placeholder for ${dropdownId}: ${text}`);
+            }
+        }
+    }
+}
 
 // Import UI helper functions
 import { displayError, hideError, showLoader, hideLoader, openModal, closeModal, enableButton, disableButton } from './uiHelpers.js';
@@ -36,7 +67,28 @@ let api = {
 
 // Initialize everything when DOM is ready
 function initializeQuoteForm() {
-    console.log('Initializing quote form...');
+    console.log('Initializing Quote Form');
+    
+    // Initialize pricing cards
+    initializePricingCards();
+    
+    // Initialize all dropdown placeholders immediately
+    initializeDropdownPlaceholders();
+    
+    
+    // Explicitly reset the circuit bearer buttons on page load
+    const oneGbitButton = document.getElementById('quote1GbitButton');
+    const tenGbitButton = document.getElementById('quote10GbitButton');
+    if (oneGbitButton && tenGbitButton) {
+        // Force white background and black text
+        oneGbitButton.classList.remove('selected');
+        tenGbitButton.classList.remove('selected');
+        oneGbitButton.style.backgroundColor = 'white';
+        tenGbitButton.style.backgroundColor = 'white';
+        oneGbitButton.style.color = 'black';
+        tenGbitButton.style.color = 'black';
+        console.log('Circuit bearer buttons reset on page load');
+    }
     
     // Try to load previous quote
     loadPreviousQuote();
@@ -176,6 +228,37 @@ function mapSavedDataToUI() {
 }
 
 // Apply selected states to all form elements based on the saved API data
+// Set initial placeholders for all dropdowns
+function initializeDropdownPlaceholders() {
+    console.log('Initializing dropdown placeholders...');
+    
+    // Map of dropdown IDs to their placeholder text
+    const dropdownPlaceholders = {
+        'quoteEtherflow1GbitDropdown': 'Select Circuit Bandwidth',
+        'quoteEtherflow10GbitDropdown': 'Select Circuit Bandwidth',
+        'quoteCircuit21GbitDropdown': 'Select Circuit 2 Bandwidth',
+        'quoteCircuit210GbitDropdown': 'Select Circuit 2 Bandwidth',
+        'quoteNumberOfIPAddresses': 'Select Number of IP Addresses'
+    };
+    
+    // Apply placeholder text to all dropdowns
+    for (const [dropdownId, placeholder] of Object.entries(dropdownPlaceholders)) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            const toggle = dropdown.querySelector('.quotequestionsdropdowntoggle');
+            const displayElement = toggle ? toggle.querySelector('div') : null;
+            
+            if (displayElement) {
+                // Only set placeholder if no selection has been made
+                if (!toggle.classList.contains('selected')) {
+                    displayElement.textContent = placeholder;
+                    displayElement.classList.add('placeholder');
+                }
+            }
+        }
+    }
+}
+
 function applySelectedStates() {
     console.log('Applying saved selections to UI elements');
     
@@ -214,7 +297,10 @@ function applySelectedStates() {
                 card.classList.add('selected');
                 
                 // Make sure next button is enabled
-                enableButton('quoteEtherwayBandwidthNext');
+                const nextButton = document.getElementById('quoteEtherwayBandwidthNext');
+                if (nextButton) {
+                    enableButton(nextButton);
+                }
             }
         });
     }
@@ -242,7 +328,10 @@ function applySelectedStates() {
             });
             
             // Enable next button
-            enableButton('quoteEtherflowBandwidthNext');
+            const etherflowNextButton = document.getElementById('quoteEtherflowBandwidthNext');
+            if (etherflowNextButton) {
+                enableButton(etherflowNextButton);
+            }
         }
     }
     
@@ -279,7 +368,10 @@ function applySelectedStates() {
             });
             
             // Enable next button
-            enableButton('quoteCircuit2BandwidthNext');
+            const circuit2NextButton = document.getElementById('quoteCircuit2BandwidthNext');
+            if (circuit2NextButton) {
+                enableButton(circuit2NextButton);
+            }
         }
     }
     
@@ -299,7 +391,10 @@ function applySelectedStates() {
             });
             
             // Enable next button
-            enableButton('quoteNumberOfIPsNext');
+            const ipsNextButton = document.getElementById('quoteNumberOfIPsNext');
+            if (ipsNextButton) {
+                enableButton(ipsNextButton);
+            }
         }
     }
     
@@ -319,7 +414,10 @@ function applySelectedStates() {
             }
             
             // Enable next button
-            enableButton('quoteSecureIpDeliveryNext');
+            const secureIpNextButton = document.getElementById('quoteSecureIpDeliveryNext');
+            if (secureIpNextButton) {
+                enableButton(secureIpNextButton);
+            }
         }
     }
     
@@ -338,7 +436,10 @@ function applySelectedStates() {
             }
             
             // Enable next button
-            enableButton('quoteZTNARequiredNext');
+            const ztnaRequiredNextButton = document.getElementById('quoteZTNARequiredNext');
+            if (ztnaRequiredNextButton) {
+                enableButton(ztnaRequiredNextButton);
+            }
         }
     }
     
@@ -349,7 +450,10 @@ function applySelectedStates() {
             input.value = api.securityQuoteParams.noOfZtnaUsers;
             
             // Enable next button
-            enableButton('quoteZTNAUsersNext');
+            const ztnaUsersNextButton = document.getElementById('quoteZTNAUsersNext');
+            if (ztnaUsersNextButton) {
+                enableButton(ztnaUsersNextButton);
+            }
         }
     }
     
@@ -368,7 +472,10 @@ function applySelectedStates() {
             }
             
             // Enable next button
-            enableButton('quoteThreatPreventionNext');
+            const threatPrevNextButton = document.getElementById('quoteThreatPreventionNext');
+            if (threatPrevNextButton) {
+                enableButton(threatPrevNextButton);
+            }
         }
     }
     
@@ -387,7 +494,10 @@ function applySelectedStates() {
             }
             
             // Enable next button
-            enableButton('quoteCASBRequiredNext');
+            const casbRequiredNextButton = document.getElementById('quoteCASBRequiredNext');
+            if (casbRequiredNextButton) {
+                enableButton(casbRequiredNextButton);
+            }
         }
     }
     
@@ -406,7 +516,10 @@ function applySelectedStates() {
             }
             
             // Enable next button
-            enableButton('quoteDLPRequiredNext');
+            const dlpRequiredNextButton = document.getElementById('quoteDLPRequiredNext');
+            if (dlpRequiredNextButton) {
+                enableButton(dlpRequiredNextButton);
+            }
         }
     }
     
@@ -425,7 +538,10 @@ function applySelectedStates() {
             }
             
             // Enable next button
-            enableButton('quoteRBIRequiredNext');
+            const rbiRequiredNextButton = document.getElementById('quoteRBIRequiredNext');
+            if (rbiRequiredNextButton) {
+                enableButton(rbiRequiredNextButton);
+            }
         }
     }
     
@@ -1547,12 +1663,28 @@ function setupCircuitBearerButtons() {
         oneGbitButton.style.pointerEvents = 'auto';
         tenGbitButton.style.pointerEvents = 'auto';
         
+        // Explicitly remove any 'selected' classes that might be applied by default
+        oneGbitButton.classList.remove('selected');
+        tenGbitButton.classList.remove('selected');
+        oneGbitButton.style.backgroundColor = '#fff';
+        tenGbitButton.style.backgroundColor = '#fff';
+        oneGbitButton.style.color = '#000';
+        tenGbitButton.style.color = '#000';
+        
         // Clear any previous event listeners by cloning
         console.log('setupCircuitBearerButtons: Cloning buttons to clear listeners.');
         const freshOneGbitButton = oneGbitButton.cloneNode(true);
         const freshTenGbitButton = tenGbitButton.cloneNode(true);
         oneGbitButton.parentNode.replaceChild(freshOneGbitButton, oneGbitButton);
         tenGbitButton.parentNode.replaceChild(freshTenGbitButton, tenGbitButton);
+        
+        // Ensure cloned buttons also have the correct styling
+        freshOneGbitButton.classList.remove('selected');
+        freshTenGbitButton.classList.remove('selected');
+        freshOneGbitButton.style.backgroundColor = '#fff';
+        freshTenGbitButton.style.backgroundColor = '#fff';
+        freshOneGbitButton.style.color = '#000';
+        freshTenGbitButton.style.color = '#000';
         
         console.log('setupCircuitBearerButtons: Attaching listener to FRESH 1Gbit button.');
         freshOneGbitButton.addEventListener('click', () => {
@@ -1600,6 +1732,7 @@ function setupCircuitBearerButtons() {
 
 // Setup dropdown behavior
 function setupDropdowns() {
+    console.log('Setting up dropdown event handlers...');
     // Get all dropdown toggles
     const dropdownToggles = document.querySelectorAll('.quotequestionsdropdowntoggle');
     
@@ -1616,21 +1749,48 @@ function setupDropdowns() {
         if (dropdown && dropdownList) {
             // Get dropdown ID to determine which step it belongs to
             const dropdownId = dropdown.id;
-            let stepId, apiKey;
+            let stepId, apiKey, placeholderText;
             
-            // Map dropdowns to their steps and API keys
+            // Map dropdowns to their steps and API keys and set placeholders
             if (dropdownId === 'quoteEtherflow1GbitDropdown' || dropdownId === 'quoteEtherflow10GbitDropdown') {
                 stepId = 'quoteEtherflowBandwidth';
                 apiKey = 'btQuoteParams.circuitBandwidth';
+                placeholderText = 'Select Circuit Bandwidth';
             } else if (dropdownId === 'quoteCircuit21GbitDropdown' || dropdownId === 'quoteCircuit210GbitDropdown') {
                 stepId = 'quoteCircuit2Bandwidth';
                 apiKey = 'btQuoteParams.circuitTwoBandwidth';
+                placeholderText = 'Select Circuit 2 Bandwidth';
             } else if (dropdownId === 'quoteNumberOfIPAddresses') {
                 stepId = 'quoteNumberOfIPs';
                 apiKey = 'btQuoteParams.numberOfIpAddresses';
+                placeholderText = 'Select Number of IP Addresses';
             }
             
+            console.log(`Setting placeholder for ${dropdownId}: ${placeholderText}`);
+            
             const nextButton = document.getElementById(`${stepId}Next`); // Get the next button element
+            
+            // Set initial placeholder or current value
+            const displayElement = newToggle.querySelector('div');
+            if (displayElement) {
+                // Check if there's a saved value
+                const keys = apiKey ? apiKey.split('.') : [];
+                const currentValue = keys.length === 2 && api[keys[0]] ? api[keys[0]][keys[1]] : null;
+                
+                if (currentValue) {
+                    // Show saved value
+                    displayElement.textContent = currentValue;
+                    displayElement.classList.remove('placeholder');
+                    newToggle.classList.add('selected');
+                    if (nextButton) enableButton(nextButton);
+                } else {
+                    // Show placeholder
+                    displayElement.textContent = placeholderText || 'Select an option';
+                    displayElement.classList.add('placeholder');
+                    newToggle.classList.remove('selected');
+                    if (nextButton) disableButton(nextButton);
+                }
+            }
             
             // Toggle dropdown when clicked
             newToggle.addEventListener('click', () => {
@@ -1664,6 +1824,8 @@ function setupDropdowns() {
                     const displayElement = newToggle.querySelector('div');
                     if (displayElement) {
                         displayElement.textContent = newLink.textContent;
+                        displayElement.classList.remove('placeholder');
+                        newToggle.classList.add('selected');
                     }
                     
                     // Close dropdown
