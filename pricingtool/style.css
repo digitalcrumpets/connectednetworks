@@ -1,7 +1,7 @@
 /* --- Global Styles & Variables --- */
 :root {
-    --primary-color: #000000;
-    --primary-hover: #222222;
+    --primary-color: #00ffa3;
+    --primary-hover: #00e090;
     --secondary-color: #222222;
     --secondary-hover: #111111;
     --background-color: #ffffff;
@@ -137,7 +137,7 @@ a:hover {
 .progress-bar {
     width: 100%;
     background-color: #eee;
-    border: 1px solid #000;
+    border: 1px solid var(--primary-color);
     height: 10px;
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -146,7 +146,7 @@ a:hover {
 .progress-bar-fill {
     height: 100%;
     width: 0%;
-    background-color: #000;
+    background-color: var(--primary-color);
     border-radius: var(--border-radius);
     transition: width 0.4s ease;
 }
@@ -212,22 +212,19 @@ a:hover {
 }
 
 .quotequestionscarditem.selected {
-    box-shadow: 0 0 0 2px #000;
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 /* Specific styling for Yes/No buttons */
 .yesno .quotequestionscarditem:first-child.selected { 
-     background-color: #000;
-     border-color: #000; 
-     box-shadow: none;
+     background-color: var(--primary-color);
+     border-color: var(--primary-color); 
 }
 
 .yesno .quotequestionscarditem:last-child.selected { 
-     background-color: #000;
-     border-color: #000; 
-      box-shadow: none;
+     background-color: var(--primary-color);
+     border-color: var(--primary-color); 
 }
-
 
 /* --- Dropdown Styles --- */
 .quotequestionsdropdown {
@@ -242,7 +239,7 @@ a:hover {
     width: 100%;
     padding: 12px 15px;
     background-color: var(--card-background);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--primary-color);
     cursor: pointer;
     text-align: left;
     font-size: 0.95rem;
@@ -269,7 +266,7 @@ html body .form-container .quotequestionsdropdowntoggle,
 html body .form-steps .quotequestionsdropdowntoggle {
     background-color: #fff !important;
     color: #000 !important;
-    border: 1px solid #000 !important;
+    border: 1px solid var(--primary-color) !important;
     font-weight: normal !important;
 }
 
@@ -298,9 +295,9 @@ html body .quotequestionsdropdowntoggle.selected,
 html body button.quotequestionsdropdowntoggle.selected,
 html body .quotequestionsdropdowntoggle.selected div,
 html body button.quotequestionsdropdowntoggle.selected div {
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #000 !important;
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+    border-color: var(--primary-color) !important;
 }
 
 /* Override button colors to ensure dropdown toggles don't use button styling */
@@ -309,7 +306,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 .quotequestionssection button.quotequestionsdropdowntoggle:not(.selected) {
     background-color: #fff !important;
     color: #000 !important;
-    border: 1px solid #000 !important;
+    border: 1px solid var(--primary-color) !important;
 }
 
 /* Specific overrides for dropdowns that have conflicts */
@@ -320,7 +317,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 #quoteNumberOfIPAddresses .quotequestionsdropdowntoggle:not(.selected) {
     background-color: #fff !important;
     color: #000 !important;
-    border: 1px solid #000 !important;
+    border: 1px solid var(--primary-color) !important;
 }
 
 /* Make sure the specific dropdown toggles with conflicts have the correct selected state */
@@ -334,9 +331,9 @@ html body button.quotequestionsdropdowntoggle.selected div {
 #quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle.selected div,
 #quoteNumberOfIPAddresses .quotequestionsdropdowntoggle.selected,
 #quoteNumberOfIPAddresses .quotequestionsdropdowntoggle.selected div {
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #000 !important;
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+    border-color: var(--primary-color) !important;
 }
 
 .quotequestionsdropdowntoggle .dropdownicon {
@@ -384,9 +381,8 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .quotequestionsdropdownlink.selected {
-    background-color: #000;
-    color: #fff;
-    font-weight: 500;
+    background-color: var(--primary-color);
+    color: #000;
 }
 
 /* --- Input Fields --- */
@@ -422,32 +418,32 @@ html body button.quotequestionsdropdowntoggle.selected div {
     padding: 10px 25px;
     font-size: 1rem;
     font-weight: 500;
-    border: 1px solid #000;
+    border: 1px solid var(--primary-color);
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
-    background-color: #000;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: #000;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
 .button:hover:not(:disabled) {
-    background-color: #222;
-    border-color: #222;
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
     transform: translateY(-1px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.12);
 }
 
 .button.secondary {
-    background-color: #000;
-    border-color: #000;
-    color: #fff;
+    background-color: #fff;
+    border-color: var(--primary-color);
+    color: #000;
 }
 
 .button.secondary:hover:not(:disabled) {
-    background-color: #222;
-    border-color: #222;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .button:disabled, .button.off {
@@ -519,7 +515,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 /* --- Loaders --- */
 .loader {
     border: 4px solid rgba(0,0,0,0.1);
-    border-top: 4px solid #000;
+    border-top: 4px solid var(--primary-color);
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
@@ -593,18 +589,28 @@ html body button.quotequestionsdropdowntoggle.selected div {
 
 .close-modal {
     color: #000;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    text-align: center;
+    border-radius: 50%;
+    line-height: 1;
+    padding-bottom: 2px; /* Small adjustment to visually center the × character */
     position: absolute;
     top: 15px;
     right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    line-height: 1;
-    opacity: 0.7;
-    transition: opacity 0.2s;
 }
 
 .close-modal:hover {
     opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: rotate(90deg);
 }
 
 .address-modal {
@@ -657,8 +663,8 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .address-results a.selected {
-    background-color: #000;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: #000;
 }
 
 /* --- Fix previous quote section layout --- */
@@ -700,9 +706,89 @@ html body button.quotequestionsdropdowntoggle.selected div {
     .quotequestionscardcontainer {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
-     .button {
+    .button {
         padding: 10px 15px;
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        padding: 15px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .navigation-buttons .button {
+        width: 100%;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+    }
+    
+    .quotequestionscardcontainer {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        padding: 15px;
+        width: 95%;
+        max-width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .address-lookup-form {
+        flex-direction: column;
+    }
+    
+    .address-lookup-form .text-input {
+        margin-bottom: 10px;
+    }
+    
+    #addressLookupButton {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        padding: 10px;
+    }
+    
+    .form-container {
+        padding: 10px;
+    }
+    
+    .text-input, .button, select {
+        font-size: 14px;
+    }
+    
+    .progress-container {
+        margin-bottom: 20px;
+    }
+    
+    .quotequestionssection {
+        padding: 10px;
+    }
+    
+    /* Ensure no horizontal scrolling */
+    .quotequestionscarditem,
+    .quotequestionsdropdowntoggle,
+    .quotequestionsdropdownlist {
+        max-width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -813,8 +899,8 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .address-results a.selected {
-    background-color: #000;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: #000;
 }
 
 .manual-entry {
@@ -890,9 +976,9 @@ html body button.quotequestionsdropdowntoggle.selected div {
 /* Higher specificity for selected buttons */
 #quote1GbitButton.circuit-button.selected,
 #quote10GbitButton.circuit-button.selected {
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #000 !important;
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+    border-color: var(--primary-color) !important;
     box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
     font-weight: 600;
     position: relative;
@@ -901,9 +987,9 @@ html body button.quotequestionsdropdowntoggle.selected div {
 
 /* Generic selected state as fallback */
 .circuit-button.selected {
-    background-color: #000;
-    color: #fff;
-    border-color: #000;
+    background-color: var(--primary-color);
+    color: #000;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
     font-weight: 600;
     position: relative;
@@ -1034,7 +1120,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .pricing-card.selected {
-    border-color: #0074d9;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.2);
 }
 
@@ -1070,7 +1156,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 .price-value {
     font-size: 28px;
     font-weight: 700;
-    color: #0074d9;
+    color: var(--primary-color);
 }
 
 .price-currency {
@@ -1092,8 +1178,8 @@ html body button.quotequestionsdropdowntoggle.selected div {
 .select-plan-btn {
     width: 100%;
     padding: 12px;
-    background-color: #0074d9;
-    color: white;
+    background-color: var(--primary-color);
+    color: #000;
     border: none;
     border-radius: 4px;
     font-size: 16px;
@@ -1103,7 +1189,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .select-plan-btn:hover {
-    background-color: #0062b3;
+    background-color: var(--primary-hover);
 }
 
 .select-plan-btn:disabled {
@@ -1112,7 +1198,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .pricing-card.selected .select-plan-btn {
-    background-color: #2ecc71;
+    background-color: var(--primary-color);
 }
 
 @media (max-width: 768px) {
@@ -1133,7 +1219,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
     
     .pricing-tab.active {
         background-color: #f5f9ff;
-        border-left: 3px solid #0074d9;
+        border-left: 3px solid var(--primary-color);
     }
 }
 
@@ -1142,7 +1228,7 @@ html body button.quotequestionsdropdowntoggle.selected div {
     margin: 15px 0;
     padding: 10px 15px;
     background-color: #e6f7ff;
-    border-left: 4px solid #1e88e5;
+    border-left: 4px solid var(--primary-color);
     border-radius: 4px;
     display: none; /* Hidden by default */
 }
@@ -1154,14 +1240,14 @@ html body button.quotequestionsdropdowntoggle.selected div {
 }
 
 .quote-saved-message a {
-    color: #1e88e5;
+    color: var(--primary-color);
     text-decoration: underline;
     font-weight: 500;
     margin-left: 5px;
 }
 
 .quote-saved-message a:hover {
-    color: #0d47a1;
+    color: var(--primary-hover);
 }
 
 /* --- Clear button styling --- */
@@ -1190,26 +1276,22 @@ html body button.quotequestionsdropdowntoggle.selected div {
     color: #333;
 }
 
-/* Remove all border radii */
-* {
-    box-shadow: none !important;
-}
-
+/* --- Responsive Adjustments --- */
 /* Buttons: black bg, white text, no radius */
 .button, button, .circuit-button, .navigation-buttons button, .modal .close-modal {
-    background-color: #000 !important;
-    color: #fff !important;
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
     border-radius: var(--border-radius) !important;
-    border: 1px solid #000 !important;
+    border: 1px solid var(--primary-color) !important;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
     transition: all 0.3s ease;
     font-weight: 500;
     letter-spacing: 0.3px;
 }
 .button:hover, button:hover, .circuit-button:hover, .navigation-buttons button:hover, .modal .close-modal:hover {
-    background-color: #222 !important;
-    color: #fff !important;
-    border: 1px solid #222 !important;
+    background-color: var(--primary-hover) !important;
+    color: #000 !important;
+    border: 1px solid var(--primary-hover) !important;
     transform: translateY(-1px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.12) !important;
 }
@@ -1244,7 +1326,7 @@ a, a:visited, a:hover {
 /* Loader: black border */
 .loader {
     border: 3px solid rgba(0,0,0,0.1) !important;
-    border-top: 3px solid #000 !important;
+    border-top: 3px solid var(--primary-color) !important;
     border-radius: 50% !important;
 }
 
@@ -1266,8 +1348,13 @@ a, a:visited, a:hover {
 }
 
 /* Remove any colored backgrounds from progress bars, etc. */
-.progress-bar, .progress-bar-fill {
+.progress-bar {
     background-color: #eee !important;
+    border-radius: var(--border-radius) !important;
+}
+
+.progress-bar-fill {
+    background-color: var(--primary-color) !important;
     border-radius: var(--border-radius) !important;
 }
 
@@ -1306,9 +1393,9 @@ button:hover,
 .button.selected,
 .circuit-button.selected,
 .address-result-item.selected {
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #000 !important;
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+    border-color: var(--primary-color) !important;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3) !important;
     transform: translateY(0);
 }
@@ -1326,8 +1413,8 @@ button:hover,
 }
 
 .address-result-item.selected {
-    background-color: #000;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: #000;
 }
 
 /* Modal close button improved interaction */
