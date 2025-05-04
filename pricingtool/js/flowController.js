@@ -1164,9 +1164,6 @@ function showStep(stepId) {
         
         // Update summary panel
         updateSummary();
-        
-        // Scroll to top of step
-        currentStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
         console.error(`Step not found: ${stepId}`);
     }
