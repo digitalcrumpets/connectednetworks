@@ -454,5 +454,42 @@
     <!-- Load JavaScript -->
     <script type="module" src="./js/main.js"></script>
 
+    <!-- Add this script to the bottom of your index.html, just before the closing body tag -->
+    <script>
+        // Function to send the current document height to the parent window
+        function updateParentHeight() {
+            const height = document.body.scrollHeight;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ 
+                    type: 'resize-iframe', 
+                    height: height 
+                }, '*');
+            }
+        }
+        
+        // Update height after page loads
+        window.addEventListener('load', updateParentHeight);
+        
+        // Update height when content changes (adjust the debounce timing as needed)
+        let resizeTimer;
+        const observer = new MutationObserver(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateParentHeight, 300);
+        });
+        
+        // Start observing the document for content changes
+        observer.observe(document.body, { 
+            childList: true, 
+            subtree: true,
+            attributes: true,
+            characterData: true
+        });
+        
+        // Also update when window is resized
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateParentHeight, 300);
+        });
+    </script>
 </body>
 </html>
