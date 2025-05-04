@@ -248,7 +248,14 @@ a:hover {
 }
 
 .quotequestionsdropdowntoggle span {
-    display: none; 
+    display: block;
+    color: #666;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.quotequestionsdropdowntoggle.selected span {
+    display: none;
 }
 
 .quotequestionsdropdowntoggle div {
@@ -259,81 +266,8 @@ a:hover {
     color: var(--text-color);
 }
 
-/* Force specific styles for all dropdown toggles regardless of other classes */
-html body .quotequestionsdropdowntoggle,
-html body button.quotequestionsdropdowntoggle,
-html body .form-container .quotequestionsdropdowntoggle,
-html body .form-steps .quotequestionsdropdowntoggle {
-    background-color: #fff !important;
-    color: #000 !important;
-    border: 1px solid var(--primary-color) !important;
-    font-weight: normal !important;
-}
-
-/* Style for the div inside dropdown toggles - no border */
-html body .quotequestionsdropdowntoggle div {
-    background-color: #fff !important;
-    color: #000 !important;
-    border: none !important;
-    font-weight: normal !important;
-}
-
-/* Force placeholder visibility */
-html body .quotequestionsdropdowntoggle div,
-html body button.quotequestionsdropdowntoggle div {
-    display: block !important;
-    visibility: visible !important;
-    color: #333 !important;
-    font-style: italic !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    opacity: 1 !important;
-}
-
-/* When a dropdown is selected, invert the colors */
-html body .quotequestionsdropdowntoggle.selected,
-html body button.quotequestionsdropdowntoggle.selected,
-html body .quotequestionsdropdowntoggle.selected div,
-html body button.quotequestionsdropdowntoggle.selected div {
-    background-color: var(--primary-color) !important;
-    color: #000 !important;
-    border-color: var(--primary-color) !important;
-}
-
-/* Override button colors to ensure dropdown toggles don't use button styling */
-.form-container button.quotequestionsdropdowntoggle:not(.selected),
-.form-steps button.quotequestionsdropdowntoggle:not(.selected),
-.quotequestionssection button.quotequestionsdropdowntoggle:not(.selected) {
-    background-color: #fff !important;
-    color: #000 !important;
-    border: 1px solid var(--primary-color) !important;
-}
-
-/* Specific overrides for dropdowns that have conflicts */
-#quoteCircuit1GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
-#quoteCircuit10GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
-#quoteCircuit21GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
-#quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle:not(.selected),
-#quoteNumberOfIPAddresses .quotequestionsdropdowntoggle:not(.selected) {
-    background-color: #fff !important;
-    color: #000 !important;
-    border: 1px solid var(--primary-color) !important;
-}
-
-/* Make sure the specific dropdown toggles with conflicts have the correct selected state */
-#quoteCircuit1GbitDropdown .quotequestionsdropdowntoggle.selected,
-#quoteCircuit1GbitDropdown .quotequestionsdropdowntoggle.selected div,
-#quoteCircuit10GbitDropdown .quotequestionsdropdowntoggle.selected,
-#quoteCircuit10GbitDropdown .quotequestionsdropdowntoggle.selected div,
-#quoteCircuit21GbitDropdown .quotequestionsdropdowntoggle.selected,
-#quoteCircuit21GbitDropdown .quotequestionsdropdowntoggle.selected div,
-#quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle.selected,
-#quoteCircuit210GbitDropdown .quotequestionsdropdowntoggle.selected div,
-#quoteNumberOfIPAddresses .quotequestionsdropdowntoggle.selected,
-#quoteNumberOfIPAddresses .quotequestionsdropdowntoggle.selected div {
-    background-color: var(--primary-color) !important;
-    color: #000 !important;
-    border-color: var(--primary-color) !important;
+.quotequestionsdropdowntoggle div.placeholder {
+    display: none !important;
 }
 
 .quotequestionsdropdowntoggle .dropdownicon {

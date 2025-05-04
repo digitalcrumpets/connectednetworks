@@ -190,18 +190,18 @@ export function showStep(stepId) {
 
     // Next button logic (initial state - might be enabled by element handlers)
     if (nextButton) {
+        // Always disable Next button on step initialization
+        disableButton(nextButton);
+        
+        // Only re-enable if there's already a valid value
         const currentValue = getApiValue(config.apiKey);
-         // Disable initially if required and no value exists
-        if (config.isRequired && (currentValue === null || currentValue === undefined || currentValue === '')) {
-             // Exception: If element handler pre-fills and validates, it might enable it.
-             // Let element handlers manage enabling, but default to disabled if required & empty.
-             const isSelected = stepElement.querySelector('.selected'); // Check if something is pre-selected
-             if (!isSelected) {
-                 disableButton(nextButton);
-             }
-        } else {
-            // If not required or value exists, enable (or let handler confirm)
-             // enableButton(nextButton); // Element handler should ideally manage this
+        if (!config.isRequired || (currentValue !== null && currentValue !== undefined && currentValue !== '')) {
+            // Exception: If element handler pre-fills and validates, it might enable it.
+            // Let element handlers manage enabling, but default to disabled if required & empty.
+            const isSelected = stepElement.querySelector('.selected'); // Check if something is pre-selected
+            if (isSelected) {
+                enableButton(nextButton);
+            }
         }
         nextButton.textContent = (config.type === 'finalSubmit') ? 'Get Quote' : 'Next';
     }

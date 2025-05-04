@@ -222,6 +222,9 @@ export const initializeDropdown = (stepElement, stepId) => {
 
             links.forEach(l => l.classList.remove('selected'));
             link.classList.add('selected');
+            
+            // Add selected class to the toggle button itself
+            toggle.classList.add('selected');
 
             // Validate
             const errorMessage = validateInput(valueToStore, config);

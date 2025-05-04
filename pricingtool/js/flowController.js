@@ -37,6 +37,7 @@ import { displayError, hideError, showLoader, hideLoader, openModal, closeModal,
 import { getApiValue } from './apiState.js';
 import { initializePricingCards, getSelectedPricingOption } from './pricingCards.js';
 import { getConfig } from './stepConfig.js';
+import { determinePricingScenario, processPricingResponse } from './pricingScenarios.js';
 
 // Global API state object
 let api = {
@@ -1204,10 +1205,14 @@ function initializeStepElements(stepId) {
                         }
                     });
                     
-                    // Enable next button
+                    // Only enable next button if a bandwidth is selected
                     const etherflowNextButton = document.getElementById('quoteEtherflowBandwidthNext');
                     if (etherflowNextButton) {
-                        enableButton(etherflowNextButton);
+                        if (api.btQuoteParams.circuitBandwidth) {
+                            enableButton(etherflowNextButton);
+                        } else {
+                            disableButton(etherflowNextButton);
+                        }
                     }
                 }
             }
@@ -1235,10 +1240,14 @@ function initializeStepElements(stepId) {
                         }
                     });
                     
-                    // Enable next button
+                    // Only enable next button if bandwidth is selected
                     const circuit2NextButton = document.getElementById('quoteCircuit2BandwidthNext');
                     if (circuit2NextButton) {
-                        enableButton(circuit2NextButton);
+                        if (api.btQuoteParams.circuitTwoBandwidth) {
+                            enableButton(circuit2NextButton);
+                        } else {
+                            disableButton(circuit2NextButton);
+                        }
                     }
                 }
             }
@@ -1735,6 +1744,33 @@ function setupCircuitBearerButtons() {
     }
 }
 
+// Update bandwidth options based on selected interface
+function updateBandwidthOptionsForInterface(interfaceType) {
+    const is1Gbit = interfaceType.includes('1000');
+    const bandwidthDropdown = is1Gbit ? 
+        document.getElementById('quoteEtherflow1GbitDropdown') : 
+        document.getElementById('quoteEtherflow10GbitDropdown');
+    
+    if (bandwidthDropdown) {
+        // Update available bandwidth options
+        const bandwidthOptions = bandwidthDropdown.querySelectorAll('.quotequestionsdropdownlink');
+        bandwidthOptions.forEach(option => {
+            const bandwidth = option.textContent;
+            if (is1Gbit) {
+                // For 1Gbit interfaces, only show bandwidth options up to 1Gbit
+                if (bandwidth.includes('Gbps')) {
+                    option.style.display = 'none';
+                } else {
+                    option.style.display = 'block';
+                }
+            } else {
+                // For 10Gbit interfaces, show all bandwidth options
+                option.style.display = 'block';
+            }
+        });
+    }
+}
+
 // Setup dropdown behavior
 function setupDropdowns() {
     console.log('Setting up dropdown event handlers...');
@@ -1953,6 +1989,9 @@ function setupCardSelections() {
 
                 case 'quoteEtherwayBandwidth': // Add case for interface options
                     api.btQuoteParams.circuitInterface = value; 
+                    
+                    // Update available bandwidth options based on selected interface
+                    updateBandwidthOptionsForInterface(value);
                     break;
                     
                 // Yes/No cases removed - handled by setupYesNoButtons
@@ -1998,7 +2037,10 @@ function selectCardItem(stepId, value) {
 let isSubmitting = false; // Flag to prevent multiple simultaneous submissions
 
 async function submitQuote() {
-    if (isSubmitting) return; // Prevent multiple submissions
+    if (isSubmitting) {
+        console.log('Already submitting, please wait...');
+        return;
+    }
     
     isSubmitting = true;
     
@@ -2042,7 +2084,7 @@ async function submitQuote() {
             
             // Ensure required values have defaults
             serviceType: api.btQuoteParams.serviceType || "single",
-            circuitInterface: api.btQuoteParams.circuitInterface || "1 Gbit/s",
+            circuitInterface: api.btQuoteParams.circuitInterface || "1000BASE-T",
             circuitBandwidth: formatBandwidth(api.btQuoteParams.circuitBandwidth) || "100 Mbit/s",
             numberOfIpAddresses: api.btQuoteParams.numberOfIpAddresses || "Block /29 (8 LAN IP Addresses)",
             preferredIpBackbone: api.btQuoteParams.preferredIpBackbone || "BT",
@@ -2097,15 +2139,29 @@ async function submitQuote() {
         if (!response.ok) {
             const errorData = await response.json();
             console.error('API Error:', errorData);
-            throw new Error(`API error: ${response.status} ${errorData.message || (errorData.error?.issues ? JSON.stringify(errorData.error.issues) : response.statusText)}`);
+            
+            // Create error message that will be converted to user-friendly message by displayError
+            const errorMessage = `API error: ${response.status} ${errorData.message || (errorData.error?.issues ? JSON.stringify(errorData.error.issues) : response.statusText)}`;
+            
+            // Display user-friendly error
+            displayError('quoteResponseError', errorMessage, true); // Pass isApiError=true
+            return null; // Return null instead of throwing to prevent unhandled promise rejection
         }
         
         // Process successful response
         const result = await response.json();
         console.log('Quote submitted successfully:', result);
         
-        // Initialize pricing cards with the API response
-        initializePricingCards(result);
+        // Determine the pricing scenario and process the response accordingly
+        const scenario = determinePricingScenario(api);
+        console.log('Pricing scenario:', scenario);
+        
+        // Process the response based on the scenario
+        const processedResult = processPricingResponse(result, scenario);
+        console.log('Processed result:', processedResult);
+        
+        // Initialize pricing cards with the processed API response
+        initializePricingCards(processedResult);
         
         // Navigate to the pricing cards section
         showStep('pricingCardsSection');

@@ -213,7 +213,11 @@ export const stepConfig = {
             // Original logic seems to go to CASB if yes, RBI if no.
             // Let's verify if DLP should always be between CASB and RBI if CASB=yes
             next: (value) => (value === true ? 'quoteCASBRequired' : 'quoteRBIRequired'), // Go to CASB if yes, else skip to RBI
-            prev: () => (getApiValue('securityQuoteParams.ztnaRequired') === true ? 'quoteZTNAUsers' : 'quoteZTNARequired')
+            prev: () => {
+                const ztnaRequired = getApiValue('securityQuoteParams.ztnaRequired');
+                console.log('Threat Prevention prev navigation - ZTNA Required:', ztnaRequired);
+                return ztnaRequired === true ? 'quoteZTNAUsers' : 'quoteZTNARequired';
+            }
         },
         condition: () => getApiValue('securityQuoteParams.secureIpDelivery') === true,
         validationRules: {}

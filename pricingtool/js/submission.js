@@ -45,7 +45,19 @@ export async function submitQuote() {
                 // If response is not JSON or empty
                 errorData = { message: response.statusText };
             }
-            throw new Error(`API Error ${response.status}: ${errorData?.message || 'Unknown error'}`);
+            
+            // Log the technical error for debugging
+            console.error('Quote Submission API Error:', {
+                status: response.status,
+                message: errorData?.message || 'Unknown error',
+                source: errorData?.source || 'quoteSubmission'
+            });
+            
+            // Create error message that will be converted to user-friendly message by displayError
+            const errorMessage = `API error: ${response.status} ${errorData?.message || 'Unknown error'}`;
+            hideLoader(GLOBAL_LOADER_ID);
+            displayError(FINAL_STEP_ERROR_ID, errorMessage, true); // Pass isApiError=true
+            return; // Don't throw error as we've handled it with a user-friendly message
         }
 
         // Success
