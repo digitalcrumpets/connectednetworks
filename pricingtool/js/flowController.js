@@ -2106,12 +2106,15 @@ async function submitQuote() {
         };
         
         // Structure the request body according to the API requirements
-        // contractTermMonths at top level, all other data inside formQuoteItem
+        // The API requires both top-level and nested structures based on the error
         const requestBody = {
-            // contractTermMonths must be at the top level as required by the API
+            // Top level fields required by the API
+            locationIdentifier: {...api.locationIdentifier},
+            btQuoteParams: btQuoteParams,
+            securityQuoteParams: securityQuoteParams,
             contractTermMonths: parseInt(api.btQuoteParams.contractTermMonths, 10) || 36,
             
-            // Primary quote data nested under formQuoteItem as required by the API
+            // Primary quote data also nested under formQuoteItem as required by the API
             formQuoteItem: {
                 locationIdentifier: {...api.locationIdentifier},
                 btQuoteParams: btQuoteParams,
