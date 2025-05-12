@@ -7,6 +7,7 @@ import {
     initializeDropdown,
     initializeNumberInput,
     initializeFinalSubmit,
+    initializeContactInfo,
     getElementValue // Import if needed, though primarily used within formElements
 } from './formElements.js';
 import { enableButton, disableButton, hideError } from './uiHelpers.js';
@@ -150,6 +151,10 @@ export function showStep(stepId) {
         case 'finalSubmit':
             // Pass the submitQuote function to the final step initializer
             initializeFinalSubmit(stepElement, stepId, submitQuote);
+            break;
+        case 'contactInfo':
+            // Initialize the contact information form
+            initializeContactInfo(stepElement, stepId);
             break;
         // Add cases for other types like 'addressLookup' if it becomes a formal step type
         default:

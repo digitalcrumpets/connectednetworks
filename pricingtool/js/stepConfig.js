@@ -298,10 +298,25 @@ export const stepConfig = {
         valueAttr: 'data-plan-name',
         isRequired: true,
         navigation: {
-            next: null, // This is the final step
+            next: 'contactInfoSection', // Changed from null to point to the contact info section
             prev: 'quoteContractTerms'
         },
         validationRules: {}
+    },
+    // --- Step 18: Contact Information ---
+    contactInfoSection: {
+        label: 'Contact Information',
+        type: 'contactInfo', // New type for handling contact form fields
+        apiKey: 'contactInfo',
+        isRequired: true,
+        navigation: {
+            next: null, // This is the final step (submission happens on this step)
+            prev: 'pricingCardsSection'
+        },
+        validationRules: {
+            email: /.+@.+\..+/, // Simple email validation pattern
+            required: ['name', 'email', 'phone'] // All fields are required
+        }
     }
 };
 

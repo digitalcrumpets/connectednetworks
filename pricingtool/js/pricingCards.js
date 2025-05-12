@@ -1,5 +1,6 @@
 // Pricing cards component for displaying BT pricing options
 import { enableButton, disableButton } from './uiHelpers.js';
+import { showStep } from './stepNavigation.js';
 
 let selectedPricingOption = null;
 let pricingData = null;
@@ -70,11 +71,11 @@ function renderPricingCards(category) {
     selectedPricingOption = null;
     
     // Get the actual button element before disabling it
-    const nextButton = document.getElementById('pricingCardsNext');
+    const nextButton = document.getElementById('pricingCardsSectionNext');
     if (nextButton) {
         disableButton(nextButton);
     } else {
-        console.warn('Next button not found: pricingCardsNext');
+        console.warn('Next button not found: pricingCardsSectionNext');
     }
     
     // Check if we have data for this category
@@ -230,11 +231,11 @@ function selectPricingCard(card) {
     };
     
     // Enable next button - get the DOM element first
-    const nextButton = document.getElementById('pricingCardsNext');
+    const nextButton = document.getElementById('pricingCardsSectionNext');
     if (nextButton) {
         enableButton(nextButton);
     } else {
-        console.warn('Next button not found: pricingCardsNext');
+        console.warn('Next button not found: pricingCardsSectionNext');
     }
 }
 
@@ -243,38 +244,40 @@ function selectPricingCard(card) {
  */
 function setupEventListeners() {
     // Previous button
-    const prevButton = document.getElementById('pricingCardsPrev');
+    const prevButton = document.getElementById('pricingCardsSectionPrev');
     if (prevButton) {
         prevButton.addEventListener('click', () => {
             // Navigate to previous step - quoteContractTerms
-            if (window.showStep) {
-                window.showStep('quoteContractTerms');
-            } else {
-                console.error('showStep function not available in global scope');
+            try {
+                showStep('quoteContractTerms');
+            } catch (error) {
+                console.error('Error navigating to previous step:', error);
             }
         });
     }
     
     // Next button
-    const nextButton = document.getElementById('pricingCardsNext');
+    const nextButton = document.getElementById('pricingCardsSectionNext');
     if (nextButton) {
         nextButton.addEventListener('click', () => {
             // Save the selected pricing option to your application state
             if (selectedPricingOption) {
                 console.log('Selected pricing option:', selectedPricingOption);
                 
-                // Display a success message
-                const apiResponseText = document.getElementById('apiResponseText');
-                if (apiResponseText) {
-                    apiResponseText.textContent = 'Your quote has been submitted successfully with your selected pricing option.';
-                    apiResponseText.className = 'response-message success-message';
-                    apiResponseText.style.display = 'block';
+                // Navigate to the contact information form 
+                try {
+                    showStep('contactInfoSection');
+                } catch (error) {
+                    console.error('Error navigating to contact info section:', error);
+                    
+                    // Fallback message if navigation fails
+                    const apiResponseText = document.getElementById('apiResponseText');
+                    if (apiResponseText) {
+                        apiResponseText.textContent = 'Your pricing option has been selected.';
+                        apiResponseText.className = 'response-message success-message';
+                        apiResponseText.style.display = 'block';
+                    }
                 }
-                
-                // This is the final step, so don't navigate anywhere else
-                // Just disable the button to prevent further clicks
-                nextButton.disabled = true;
-                nextButton.textContent = 'Selection Complete';
             }
         });
     }
@@ -298,10 +301,10 @@ export function resetPricingCardSelection() {
     allCards.forEach(c => c.classList.remove('selected'));
     
     // Disable next button - get the DOM element first
-    const nextButton = document.getElementById('pricingCardsNext');
+    const nextButton = document.getElementById('pricingCardsSectionNext');
     if (nextButton) {
         disableButton(nextButton);
     } else {
-        console.warn('Next button not found: pricingCardsNext');
+        console.warn('Next button not found: pricingCardsSectionNext');
     }
 }

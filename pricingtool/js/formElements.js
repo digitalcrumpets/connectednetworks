@@ -390,3 +390,64 @@ export const initializeFinalSubmit = (stepElement, stepId, submitAction) => {
         };
     }
 };
+
+/**
+ * Initializes behavior for the 'contactInfo' type step.
+ * Handles the contact information form with validation.
+ * @param {HTMLElement} stepElement - The container element for the step.
+ * @param {string} stepId - The ID of the current step.
+ */
+export const initializeContactInfo = (stepElement, stepId) => {
+    const config = getConfig(stepId);
+    if (!config) return;
+
+    const nameInput = stepElement.querySelector('#contactName');
+    const emailInput = stepElement.querySelector('#contactEmail');
+    const phoneInput = stepElement.querySelector('#contactPhone');
+    const nextButton = document.getElementById(`${stepId}Next`);
+    const errorContainerId = `step-${stepId}-error`;
+
+    // Get any existing values from API state to pre-fill
+    const contactData = getApiValue(config.apiKey) || {};
+    if (contactData.name) nameInput.value = contactData.name;
+    if (contactData.email) emailInput.value = contactData.email;
+    if (contactData.phone) phoneInput.value = contactData.phone;
+
+    // Function to validate all fields and update button state
+    const validateContactForm = () => {
+        hideError(errorContainerId);
+        
+        // Get current values
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const phone = phoneInput.value.trim();
+        
+        // Check required fields
+        if (!name || !email || !phone) {
+            displayError(errorContainerId, 'All fields are required.');
+            disableButton(nextButton);
+            return false;
+        }
+        
+        // Email validation (using the pattern in config)
+        if (config.validationRules.email && !config.validationRules.email.test(email)) {
+            displayError(errorContainerId, 'Please enter a valid email address.');
+            disableButton(nextButton);
+            return false;
+        }
+        
+        // If we reach here, form is valid
+        const contactInfo = { name, email, phone };
+        setApiValue(config.apiKey, contactInfo);
+        enableButton(nextButton);
+        return true;
+    };
+
+    // Add event listeners to all inputs
+    nameInput.addEventListener('input', validateContactForm);
+    emailInput.addEventListener('input', validateContactForm);
+    phoneInput.addEventListener('input', validateContactForm);
+    
+    // Initial validation when step is shown
+    validateContactForm();
+};
